@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
+from jsonschema import Draft202012Validator
 from openai import OpenAI
 
 
@@ -28,11 +29,8 @@ def load_text_if_exists(path: Path) -> str:
 # ---------------------------------------------------------------------------
 
 def validate_task_envelope(task_data: dict) -> None:
-    """Garante que a task tem agent_id, schema_version e inputs antes de qualquer
-    chamada ao modelo ou carregamento de schema do agente."""
-    required_top = ["agent_id", "schema_version", "inputs"]
-
-    for key in required_top:
+    """Garante agent_id, schema_version e inputs antes de qualquer chamada."""
+    for key in ["agent_id", "schema_version", "inputs"]:
         if key not in task_data:
             raise ValueError(f"Task inválida: campo obrigatório ausente '{key}'")
 
@@ -47,7 +45,42 @@ def validate_task_envelope(task_data: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Stub: restante do pipeline (será preenchido nos próximos commits)
+# Validação com JSON Schema
+# ---------------------------------------------------------------------------
+
+def validate_with_schema(instance: dict, schema: dict, label: str) -> None:
+    """Valida instance contra schema; falha com mensagem legível."""
+    validator = Draft202012Validator(schema)
+    errors = sorted(validator.iter_errors(instance), key=lambda e: e.path)
+
+    if not errors:
+        return
+
+    messages = []
+    for err in errors:
+        field_path = ".".join(str(p) for p in err.path) or "<root>"
+        messages.append(f"- {label}: campo '{field_path}': {err.message}")
+
+    raise ValueError("\n".join(messages))
+
+
+# ---------------------------------------------------------------------------
+# Carregamento dos arquivos do agente
+# ---------------------------------------------------------------------------
+
+def load_agent_files(agent_dir: Path) -> dict:
+    """Carrega agent.md, templates.md, checklist.md, input/output schemas."""
+    return {
+        "agent_md": load_text_if_exists(agent_dir / "agent.md"),
+        "templates_md": load_text_if_exists(agent_dir / "templates.md"),
+        "checklist_md": load_text_if_exists(agent_dir / "checklist.md"),
+        "input_schema": load_json(agent_dir / "input-schema.json"),
+        "output_schema": load_json(agent_dir / "output-schema.json"),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Stub: restante do pipeline (próximo commit)
 # ---------------------------------------------------------------------------
 
 def main():
@@ -72,8 +105,13 @@ def main():
     if not agent_dir.exists():
         raise FileNotFoundError(f"Diretório do agente não encontrado: {agent_dir}")
 
-    print(f"[envelope OK] agent_id={agent_id}, schema_version={task_data['schema_version']}")
-    print("TODO: validação de inputs, chamada ao modelo e validação de output (próximos commits)")
+    agent_files = load_agent_files(agent_dir)
+
+    # Valida inputs com o input-schema do agente
+    validate_with_schema(task_data["inputs"], agent_files["input_schema"], "input-schema")
+
+    print(f"[inputs OK] agent_id={agent_id}")
+    print("TODO: montagem do prompt, chamada ao modelo e validação de output (próximo commit)")
 
 
 if __name__ == "__main__":
