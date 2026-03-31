@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Input do Orquestrador",
+  "type": "object",
+  "required": ["objetivo_ciclo"],
+  "properties": {
+    "objetivo_ciclo": {
+      "type": "string",
+      "description": "Objetivo principal do ciclo (ex: aumentar leads em 30% no Q2)"
+    },
+    "duracao_dias": {
+      "type": "integer",
+      "description": "Duração do ciclo em dias",
+      "default": 90
+    },
+    "restricoes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Restrições de tempo, orçamento ou recurso"
+    },
+    "contexto_ciclo_anterior": {
+      "type": "string",
+      "description": "Resumo dos resultados do ciclo anterior"
+    },
+    "agentes_disponiveis": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Lista de agentes ativos no repositório",
+      "default": ["01-depoimentos", "02-cases", "03-seo-local"]
+    }
+  }
+}
