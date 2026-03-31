@@ -26,28 +26,26 @@ def load_text_if_exists(path: Path) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Validação do envelope da task
+# Validacao do envelope da task
 # ---------------------------------------------------------------------------
 
 def validate_task_envelope(task_data: dict) -> None:
-    """Garante agent_id, schema_version e inputs antes de qualquer chamada."""
     for key in ["agent_id", "schema_version", "inputs"]:
         if key not in task_data:
-            raise ValueError(f"Task inválida: campo obrigatório ausente '{key}'")
+            raise ValueError(f"Task invalida: campo obrigatorio ausente '{key}'")
     if not isinstance(task_data["agent_id"], str) or not task_data["agent_id"].strip():
-        raise ValueError("Task inválida: 'agent_id' deve ser string não vazia")
+        raise ValueError("Task invalida: 'agent_id' deve ser string nao vazia")
     if not isinstance(task_data["schema_version"], str) or not task_data["schema_version"].strip():
-        raise ValueError("Task inválida: 'schema_version' deve ser string não vazia")
+        raise ValueError("Task invalida: 'schema_version' deve ser string nao vazia")
     if not isinstance(task_data["inputs"], dict):
-        raise ValueError("Task inválida: 'inputs' deve ser um objeto JSON")
+        raise ValueError("Task invalida: 'inputs' deve ser um objeto JSON")
 
 
 # ---------------------------------------------------------------------------
-# Validação com JSON Schema
+# Validacao com JSON Schema
 # ---------------------------------------------------------------------------
 
 def validate_with_schema(instance: dict, schema: dict, label: str) -> None:
-    """Valida instance contra schema; falha com mensagem legível."""
     validator = Draft202012Validator(schema)
     errors = sorted(validator.iter_errors(instance), key=lambda e: e.path)
     if not errors:
@@ -64,7 +62,6 @@ def validate_with_schema(instance: dict, schema: dict, label: str) -> None:
 # ---------------------------------------------------------------------------
 
 def load_agent_files(agent_dir: Path) -> dict:
-    """Carrega agent.md, templates.md, checklist.md, input/output schemas."""
     return {
         "agent_md": load_text_if_exists(agent_dir / "agent.md"),
         "templates_md": load_text_if_exists(agent_dir / "templates.md"),
@@ -95,12 +92,12 @@ def load_global_context(context_dir: Path) -> str:
 
 def build_messages(task_data: dict, agent_files: dict, global_context: str) -> list:
     system_parts = [
-        "Você é um agente especializado do sistema Higilabor.",
-        "Responda exclusivamente com JSON válido.",
-        "Não use markdown.",
-        "Não use blocos de código.",
-        "Não escreva comentários fora do JSON.",
-        "A saída deve obedecer exatamente ao output schema fornecido."
+        "Voce e um agente especializado do sistema Higilabor.",
+        "Responda exclusivamente com JSON valido.",
+        "Nao use markdown.",
+        "Nao use blocos de codigo.",
+        "Nao escreva comentarios fora do JSON.",
+        "A saida deve obedecer exatamente ao output schema fornecido."
     ]
     if agent_files["agent_md"]:
         system_parts.append("\n# AGENT\n" + agent_files["agent_md"])
@@ -138,7 +135,7 @@ def call_model(messages: list, model: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Parse seguro da saída JSON do modelo
+# Parse seguro da saida JSON do modelo
 # ---------------------------------------------------------------------------
 
 def extract_json_text(raw_text: str) -> str:
@@ -151,7 +148,7 @@ def extract_json_text(raw_text: str) -> str:
     obj_match = re.search(r"(\{.*\})", text, re.DOTALL)
     if obj_match:
         return obj_match.group(1).strip()
-    raise ValueError("Resposta do modelo não contém JSON válido detectável")
+    raise ValueError("Resposta do modelo nao contem JSON valido detectavel")
 
 
 def parse_model_json(raw_text: str) -> dict:
@@ -159,15 +156,14 @@ def parse_model_json(raw_text: str) -> dict:
     try:
         return json.loads(json_text)
     except json.JSONDecodeError as e:
-        raise ValueError(f"Saída inválida: JSON malformado na linha {e.lineno}, coluna {e.colno}: {e.msg}")
+        raise ValueError(f"Saida invalida: JSON malformado na linha {e.lineno}, coluna {e.colno}: {e.msg}")
 
 
 # ---------------------------------------------------------------------------
-# Bloco 1: Geração do run_id e diretório de execução
+# Bloco 1: Geracao do run_id e diretorio de execucao
 # ---------------------------------------------------------------------------
 
 def create_run_dir(repo_root: Path, agent_id: str) -> tuple[str, Path]:
-    """Gera run_id único e cria outputs/YYYY-MM/run-TIMESTAMP-AGENTID/."""
     now = datetime.now(timezone.utc)
     timestamp = now.strftime("%Y%m%d-%H%M%S")
     run_id = f"run-{timestamp}-{agent_id}"
@@ -178,7 +174,7 @@ def create_run_dir(repo_root: Path, agent_id: str) -> tuple[str, Path]:
 
 
 # ---------------------------------------------------------------------------
-# Bloco 2: Salvar artefatos da execução
+# Bloco 2: Salvar artefatos da execucao
 # ---------------------------------------------------------------------------
 
 def save_artifacts(
@@ -187,7 +183,6 @@ def save_artifacts(
     parsed_output: dict,
     meta: dict,
 ) -> None:
-    """Salva raw.md, parsed.json e meta.json na pasta da execução."""
     (run_dir / "raw.md").write_text(raw_output, encoding="utf-8")
     with (run_dir / "parsed.json").open("w", encoding="utf-8") as f:
         json.dump(parsed_output, f, ensure_ascii=False, indent=2)
@@ -196,11 +191,10 @@ def save_artifacts(
 
 
 # ---------------------------------------------------------------------------
-# Bloco 3: Salvar meta de erro auditável
+# Bloco 3: Salvar meta de erro auditavel
 # ---------------------------------------------------------------------------
 
 def save_error_meta(run_dir, meta: dict, error_msg: str) -> None:
-    """Mesmo em caso de erro, persiste meta.json com success: false."""
     if run_dir is None:
         return
     meta["success"] = False
@@ -231,7 +225,7 @@ def main():
 
     try:
         if not task_path.exists():
-            raise FileNotFoundError(f"Task não encontrada: {task_path}")
+            raise FileNotFoundError(f"Task nao encontrada: {task_path}")
 
         task_data = load_json(task_path)
         validate_task_envelope(task_data)
@@ -239,14 +233,11 @@ def main():
         agent_id = task_data["agent_id"]
         agent_dir = repo_root / "agents" / agent_id
         if not agent_dir.exists():
-            raise FileNotFoundError(f"Diretório do agente não encontrado: {agent_dir}")
+            raise FileNotFoundError(f"Diretorio do agente nao encontrado: {agent_dir}")
 
         agent_files = load_agent_files(agent_dir)
-
-        # Valida inputs antes da chamada ao modelo
         validate_with_schema(task_data["inputs"], agent_files["input_schema"], "input-schema")
 
-        # --- Bloco 1: cria run_id e diretório ---
         model = os.getenv("OPENAI_MODEL", "gpt-4o")
         run_id, run_dir = create_run_dir(repo_root, agent_id)
         start_ts = datetime.now(timezone.utc)
@@ -261,20 +252,16 @@ def main():
             "input_valid": True,
         }
 
-        # Monta prompt
         global_context = load_global_context(repo_root / "context")
         messages = build_messages(task_data, agent_files, global_context)
 
-        # Chama o modelo
         raw_output = call_model(messages, model)
         if not raw_output.strip():
-            raise ValueError("Saída vazia do modelo")
+            raise ValueError("Saida vazia do modelo")
 
-        # Parseia e valida o output
         parsed_output = parse_model_json(raw_output)
         validate_with_schema(parsed_output, agent_files["output_schema"], "output-schema")
 
-        # Calcula duração
         finished_at = datetime.now(timezone.utc)
         duration_ms = int((finished_at - start_ts).total_seconds() * 1000)
 
@@ -285,14 +272,11 @@ def main():
             "success": True,
         })
 
-        # --- Bloco 2: salva artefatos ---
         save_artifacts(run_dir, raw_output, parsed_output, meta)
-
-        print(f"OK: execução {run_id} salva em {run_dir}")
+        print(f"OK: execucao {run_id} salva em {run_dir}")
 
     except Exception as exc:
         error_msg = str(exc)
-        # --- Bloco 3: erro auditável ---
         save_error_meta(run_dir, meta, error_msg)
         print(f"ERRO: {error_msg}", file=sys.stderr)
         sys.exit(1)
