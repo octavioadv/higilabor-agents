@@ -3,12 +3,12 @@ import json
 import os
 import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
 from jsonschema import Draft202012Validator
 from openai import OpenAI
-
 
 # ---------------------------------------------------------------------------
 # Helpers: leitura segura
@@ -26,42 +26,34 @@ def load_text_if_exists(path: Path) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Validação do envelope da task
+# Validacao do envelope da task
 # ---------------------------------------------------------------------------
 
 def validate_task_envelope(task_data: dict) -> None:
-    """Garante agent_id, schema_version e inputs antes de qualquer chamada."""
     for key in ["agent_id", "schema_version", "inputs"]:
         if key not in task_data:
-            raise ValueError(f"Task inválida: campo obrigatório ausente '{key}'")
-
+            raise ValueError(f"Task invalida: campo obrigatorio ausente '{key}'")
     if not isinstance(task_data["agent_id"], str) or not task_data["agent_id"].strip():
-        raise ValueError("Task inválida: 'agent_id' deve ser string não vazia")
-
+        raise ValueError("Task invalida: 'agent_id' deve ser string nao vazia")
     if not isinstance(task_data["schema_version"], str) or not task_data["schema_version"].strip():
-        raise ValueError("Task inválida: 'schema_version' deve ser string não vazia")
-
+        raise ValueError("Task invalida: 'schema_version' deve ser string nao vazia")
     if not isinstance(task_data["inputs"], dict):
-        raise ValueError("Task inválida: 'inputs' deve ser um objeto JSON")
+        raise ValueError("Task invalida: 'inputs' deve ser um objeto JSON")
 
 
 # ---------------------------------------------------------------------------
-# Validação com JSON Schema
+# Validacao com JSON Schema
 # ---------------------------------------------------------------------------
 
 def validate_with_schema(instance: dict, schema: dict, label: str) -> None:
-    """Valida instance contra schema; falha com mensagem legível."""
     validator = Draft202012Validator(schema)
     errors = sorted(validator.iter_errors(instance), key=lambda e: e.path)
-
     if not errors:
         return
-
     messages = []
     for err in errors:
-        field_path = ".".join(str(p) for p in err.path) or "<root>"
+        field_path = ".".join(str(p) for p in err.path) or ""
         messages.append(f"- {label}: campo '{field_path}': {err.message}")
-
     raise ValueError("\n".join(messages))
 
 
@@ -70,7 +62,6 @@ def validate_with_schema(instance: dict, schema: dict, label: str) -> None:
 # ---------------------------------------------------------------------------
 
 def load_agent_files(agent_dir: Path) -> dict:
-    """Carrega agent.md, templates.md, checklist.md, input/output schemas."""
     return {
         "agent_md": load_text_if_exists(agent_dir / "agent.md"),
         "templates_md": load_text_if_exists(agent_dir / "templates.md"),
@@ -87,7 +78,6 @@ def load_agent_files(agent_dir: Path) -> dict:
 def load_global_context(context_dir: Path) -> str:
     if not context_dir.exists():
         return ""
-
     parts = []
     for file in sorted(context_dir.glob("*.md")):
         content = file.read_text(encoding="utf-8").strip()
@@ -102,35 +92,28 @@ def load_global_context(context_dir: Path) -> str:
 
 def build_messages(task_data: dict, agent_files: dict, global_context: str) -> list:
     system_parts = [
-        "Você é um agente especializado do sistema Higilabor.",
-        "Responda exclusivamente com JSON válido.",
-        "Não use markdown.",
-        "Não use blocos de código.",
-        "Não escreva comentários fora do JSON.",
-        "A saída deve obedecer exatamente ao output schema fornecido."
+        "Voce e um agente especializado do sistema Higilabor.",
+        "Responda exclusivamente com JSON valido.",
+        "Nao use markdown.",
+        "Nao use blocos de codigo.",
+        "Nao escreva comentarios fora do JSON.",
+        "A saida deve obedecer exatamente ao output schema fornecido."
     ]
-
     if agent_files["agent_md"]:
         system_parts.append("\n# AGENT\n" + agent_files["agent_md"])
-
     if global_context:
         system_parts.append("\n# CONTEXT\n" + global_context)
-
     if agent_files["templates_md"]:
         system_parts.append("\n# TEMPLATE\n" + agent_files["templates_md"])
-
     if agent_files["checklist_md"]:
         system_parts.append("\n# CHECKLIST\n" + agent_files["checklist_md"])
-
     system_parts.append(
         "\n# OUTPUT_SCHEMA\n" + json.dumps(agent_files["output_schema"], ensure_ascii=False, indent=2)
     )
-
     user_payload = {
         "task": task_data.get("task", ""),
         "inputs": task_data["inputs"]
     }
-
     return [
         {"role": "system", "content": "\n\n".join(system_parts)},
         {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False, indent=2)}
@@ -152,24 +135,20 @@ def call_model(messages: list, model: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Parse seguro da saída JSON do modelo
+# Parse seguro da saida JSON do modelo
 # ---------------------------------------------------------------------------
 
 def extract_json_text(raw_text: str) -> str:
     text = raw_text.strip()
-
     fence_match = re.search(r"```(?:json)?\s*(\{.*\}|\[.*\])\s*```", text, re.DOTALL)
     if fence_match:
         return fence_match.group(1).strip()
-
     if text.startswith("{") or text.startswith("["):
         return text
-
     obj_match = re.search(r"(\{.*\})", text, re.DOTALL)
     if obj_match:
         return obj_match.group(1).strip()
-
-    raise ValueError("Resposta do modelo não contém JSON válido detectável")
+    raise ValueError("Resposta do modelo nao contem JSON valido detectavel")
 
 
 def parse_model_json(raw_text: str) -> dict:
@@ -177,7 +156,55 @@ def parse_model_json(raw_text: str) -> dict:
     try:
         return json.loads(json_text)
     except json.JSONDecodeError as e:
-        raise ValueError(f"Saída inválida: JSON malformado na linha {e.lineno}, coluna {e.colno}: {e.msg}")
+        raise ValueError(f"Saida invalida: JSON malformado na linha {e.lineno}, coluna {e.colno}: {e.msg}")
+
+
+# ---------------------------------------------------------------------------
+# Bloco 1: Geracao do run_id e diretorio de execucao
+# ---------------------------------------------------------------------------
+
+def create_run_dir(repo_root: Path, agent_id: str) -> tuple[str, Path]:
+    now = datetime.now(timezone.utc)
+    timestamp = now.strftime("%Y%m%d-%H%M%S")
+    run_id = f"run-{timestamp}-{agent_id}"
+    month_dir = now.strftime("%Y-%m")
+    run_dir = repo_root / "outputs" / month_dir / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+    return run_id, run_dir
+
+
+# ---------------------------------------------------------------------------
+# Bloco 2: Salvar artefatos da execucao
+# ---------------------------------------------------------------------------
+
+def save_artifacts(
+    run_dir: Path,
+    raw_output: str,
+    parsed_output: dict,
+    meta: dict,
+) -> None:
+    (run_dir / "raw.md").write_text(raw_output, encoding="utf-8")
+    with (run_dir / "parsed.json").open("w", encoding="utf-8") as f:
+        json.dump(parsed_output, f, ensure_ascii=False, indent=2)
+    with (run_dir / "meta.json").open("w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+
+
+# ---------------------------------------------------------------------------
+# Bloco 3: Salvar meta de erro auditavel
+# ---------------------------------------------------------------------------
+
+def save_error_meta(run_dir, meta: dict, error_msg: str) -> None:
+    if run_dir is None:
+        return
+    meta["success"] = False
+    meta["error"] = error_msg
+    meta.setdefault("finished_at", datetime.now(timezone.utc).isoformat())
+    try:
+        with (run_dir / "meta.json").open("w", encoding="utf-8") as f:
+            json.dump(meta, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -186,7 +213,6 @@ def parse_model_json(raw_text: str) -> dict:
 
 def main():
     load_dotenv()
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--task", required=True, help="Caminho para o arquivo de task JSON")
     args = parser.parse_args()
@@ -194,47 +220,66 @@ def main():
     repo_root = Path(__file__).resolve().parents[1]
     task_path = Path(args.task).resolve()
 
-    if not task_path.exists():
-        raise FileNotFoundError(f"Task não encontrada: {task_path}")
+    run_dir = None
+    meta = {}
 
-    task_data = load_json(task_path)
-    validate_task_envelope(task_data)
+    try:
+        if not task_path.exists():
+            raise FileNotFoundError(f"Task nao encontrada: {task_path}")
 
-    agent_id = task_data["agent_id"]
-    agent_dir = repo_root / "agents" / agent_id
+        task_data = load_json(task_path)
+        validate_task_envelope(task_data)
 
-    if not agent_dir.exists():
-        raise FileNotFoundError(f"Diretório do agente não encontrado: {agent_dir}")
+        agent_id = task_data["agent_id"]
+        agent_dir = repo_root / "agents" / agent_id
+        if not agent_dir.exists():
+            raise FileNotFoundError(f"Diretorio do agente nao encontrado: {agent_dir}")
 
-    agent_files = load_agent_files(agent_dir)
+        agent_files = load_agent_files(agent_dir)
+        validate_with_schema(task_data["inputs"], agent_files["input_schema"], "input-schema")
 
-    # Valida inputs antes da chamada ao modelo
-    validate_with_schema(task_data["inputs"], agent_files["input_schema"], "input-schema")
+        model = os.getenv("OPENAI_MODEL", "gpt-4o")
+        run_id, run_dir = create_run_dir(repo_root, agent_id)
+        start_ts = datetime.now(timezone.utc)
 
-    # Monta prompt
-    global_context = load_global_context(repo_root / "context")
-    messages = build_messages(task_data, agent_files, global_context)
+        meta = {
+            "run_id": run_id,
+            "agent_id": agent_id,
+            "schema_version": task_data["schema_version"],
+            "task_file": str(task_path.relative_to(repo_root)),
+            "model": model,
+            "started_at": start_ts.isoformat(),
+            "input_valid": True,
+        }
 
-    # Chama o modelo
-    model = os.getenv("OPENAI_MODEL", "gpt-4o")
-    raw_output = call_model(messages, model)
+        global_context = load_global_context(repo_root / "context")
+        messages = build_messages(task_data, agent_files, global_context)
 
-    if not raw_output.strip():
-        raise ValueError("Saída vazia do modelo")
+        raw_output = call_model(messages, model)
+        if not raw_output.strip():
+            raise ValueError("Saida vazia do modelo")
 
-    # Parseia e valida o output
-    parsed_output = parse_model_json(raw_output)
-    validate_with_schema(parsed_output, agent_files["output_schema"], "output-schema")
+        parsed_output = parse_model_json(raw_output)
+        validate_with_schema(parsed_output, agent_files["output_schema"], "output-schema")
 
-    # Salva a saída validada
-    outputs_dir = repo_root / "outputs"
-    outputs_dir.mkdir(parents=True, exist_ok=True)
+        finished_at = datetime.now(timezone.utc)
+        duration_ms = int((finished_at - start_ts).total_seconds() * 1000)
 
-    output_file = outputs_dir / f"{agent_id}-output.json"
-    with output_file.open("w", encoding="utf-8") as f:
-        json.dump(parsed_output, f, ensure_ascii=False, indent=2)
+        meta.update({
+            "finished_at": finished_at.isoformat(),
+            "duration_ms": duration_ms,
+            "output_valid": True,
+            "success": True,
+        })
 
-    print(f"OK: saída validada salva em {output_file}")
+        save_artifacts(run_dir, raw_output, parsed_output, meta)
+        print(f"OK: execucao {run_id} salva em {run_dir}")
+
+    except Exception as exc:
+        error_msg = str(exc)
+        save_error_meta(run_dir, meta, error_msg)
+        print(f"ERRO: {error_msg}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
