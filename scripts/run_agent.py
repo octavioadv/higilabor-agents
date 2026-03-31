@@ -199,7 +199,7 @@ def save_artifacts(
 # Bloco 3: Salvar meta de erro auditável
 # ---------------------------------------------------------------------------
 
-def save_error_meta(run_dir: Path | None, meta: dict, error_msg: str) -> None:
+def save_error_meta(run_dir, meta: dict, error_msg: str) -> None:
     """Mesmo em caso de erro, persiste meta.json com success: false."""
     if run_dir is None:
         return
@@ -210,7 +210,7 @@ def save_error_meta(run_dir: Path | None, meta: dict, error_msg: str) -> None:
         with (run_dir / "meta.json").open("w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False, indent=2)
     except Exception:
-        pass  # melhor esforço — não mascara o erro original
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -226,9 +226,8 @@ def main():
     repo_root = Path(__file__).resolve().parents[1]
     task_path = Path(args.task).resolve()
 
-    # Estado rastreável mesmo antes da execução
-    run_dir: Path | None = None
-    meta: dict = {}
+    run_dir = None
+    meta = {}
 
     try:
         if not task_path.exists():
@@ -250,7 +249,6 @@ def main():
         # --- Bloco 1: cria run_id e diretório ---
         model = os.getenv("OPENAI_MODEL", "gpt-4o")
         run_id, run_dir = create_run_dir(repo_root, agent_id)
-        started_at = datetime.now(timezone.utc).isoformat()
         start_ts = datetime.now(timezone.utc)
 
         meta = {
@@ -259,7 +257,7 @@ def main():
             "schema_version": task_data["schema_version"],
             "task_file": str(task_path.relative_to(repo_root)),
             "model": model,
-            "started_at": started_at,
+            "started_at": start_ts.isoformat(),
             "input_valid": True,
         }
 
