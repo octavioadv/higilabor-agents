@@ -1,30 +1,31 @@
 # Posicionamento Higilabor
 
-## Proposta de Valor
-A Higilabor entrega serviços de limpeza, higienização e SST com responsabilidade técnica, jurídica e operacional para empresas que não podem errar.
+## Proposta de Valor Central
+A Higilabor oferece terceirização de serviços de limpeza, higienização e conservação com rigor técnico, conformidade legal e gestão orientada a resultados para empresas e instituições que exigem padrões elevados.
+
+## Diferenciais Competitivos
+- Equipe treinada com protocolos técnicos documentados
+- Conformidade com legislação trabalhista e normas sanitárias
+- Gestão de contratos com SLA definido e monitorado
+- Relatórios de desempenho e rastreabilidade de serviços
+- Atendimento a setores regulados (saúde, alimentação, educação)
 
 ## Posicionamento de Mercado
-- Segmento: B2B (empresas, hospitais, escolas, indústrias, órgãos públicos)
-- Tier: médio-alto (não compete por preço mínimo)
-- Diferenciação: qualidade técnica + segurança jurídica + experiência regional
+- Segmento: B2B (empresas, hospitais, escolas, indústrias, condomínios)
+- Tier: Médio-alto (não concorre por preço mínimo)
+- Diferenciação: Qualidade técnica + segurança jurídica + confiabilidade
 
-## Mensagem Central
+## Mensagem Principal
 "Limpeza com responsabilidade técnica e jurídica — para quem não pode errar."
 
 ## Anti-posicionamento
-- não somos a opção mais barata
-- não atendemos sem escopo definido
-- não prometemos sem diagnóstico
+- Não somos a opção mais barata do mercado
+- Não atendemos contratos sem escopo definido
+- Não prometemos resultados sem diagnóstico prévio
 
-## Tom de Voz
-- técnico e confiável
-- empresarial sem ser frio
-- direto e orientado a resultados
-- sem hiperboles ou adjetivos vazios
-
-## Canais Prioritários
-1. indicação de clientes ativos
-2. LinkedIn (prospecção B2B)
-3. licitações públicas
-4. Google (SEO local)
-5. parcerias com facilities e administradoras
+## Canais de Aquisição Prioritários
+1. Indicação de clientes ativos
+2. LinkedIn e prospecção ativa B2B
+3. Licitações públicas
+4. Parcerias com facilities e administradoras
+5. SEO local (Google Meu Negócio + site)

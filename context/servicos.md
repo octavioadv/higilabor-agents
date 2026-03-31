@@ -1,37 +1,40 @@
-# Serviços Higilabor
+# Catálogo de Serviços Higilabor
 
 ## 1. Limpeza Geral e Conservação
 - Limpeza periódica de ambientes corporativos
 - Conservação diária (escritórios, corredores, banheiros, refeitórios)
-- SLA: 100% de cobertura nos dias acordados
+- Freqüência: diária, semanal ou sob demanda
+- SLA: 100% de cobertura nos dias acordados em contrato
 
 ## 2. Higienização Técnica
-- Ambientes críticos: hospitais, clínicas, laboratórios
+- Higienização de ambientes críticos (hospitais, clínicas, laboratórios)
 - Protocolos de desinfecção e controle de biocontaminação
-- Conformidade ANVISA e normas ABNT
+- Produtos certificados e rastreados
+- SLA: conformidade com ANVISA/normas setoriais
 
-## 3. Terceirização de Mão de Obra
-- Equipe treinada, uniformizada, documentada
+## 3. Terceirização de Mão de Obra de Limpeza
+- Fornecimento de equipe treinada e uniformizada
 - Gestão de ponto, folha e substituições
 - Responsabilidade trabalhista integral da Higilabor
-- SLA: cobertura de faltas em até 2h úteis
+- SLA: cobertura de 100% das faltas em até 2h úteis
 
 ## 4. Limpeza Pós-Obra
-- Remoção de resíduos de construção
+- Remoção de entulho, pó de massa, resíduos de construção
 - Polimento e tratamento de pisos
 - Entrega: ambiente pronto para ocupação
 
 ## 5. Limpeza de Fachadas e Áreas Externas
-- Lavagem e conservação
-- Inclui trabalho em altura
+- Lavagem e conservação de fachadas
+- Limpeza de estacionamentos, calçadas e áreas comuns
+- Inclui trabalho em altura quando necessário
 
-## 6. Higiene Ocupacional / SST
-- Laudos técnicos
-- Perícias e consultorias
-- Gestão de passivo trabalhista
+## 6. Controle de Pragas (Parceria Certificada)
+- Desinsetização e desratização
+- Laudo técnico emitido por empresa parceira licenciada
+- Integração com plano de higienização do cliente
 
 ## Modelo Comercial
 - Contratos mensais (mínimo 12 meses para desconto)
 - Projetos pontuais (pós-obra, eventos, emergências)
-- Pricing: por métro quadrado ou por posto de trabalho
-- Proposta após visita técnica
+- Pricing: por mé trico quadrado ou por posto de trabalho
+- Proposta customizada após visita técnica
