@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "tema": { "type": "string" },
+    "palavra_chave": { "type": "string" },
+    "objetivo": { "type": "string" },
+    "publico": { "type": "string" },
+    "profundidade": { "type": "string" }
+  }
+}
