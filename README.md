@@ -11,29 +11,32 @@ Transformar diagnósticos estratégicos em execução contínua por agentes espe
 ```
 higilabor-agents/
 ├─ agents/
-│  ├─ 00-orquestrador/
-│  ├─ 01-depoimentos/
-│  ├─ 02-cases/
-│  ├─ 03-seo-local/
-│  ├─ 04-linkedin/
-│  └─ 05-blog/
+│ ├─ 00-orquestrador/
+│ ├─ 01-depoimentos/
+│ ├─ 02-cases/
+│ ├─ 03-seo-local/
+│ ├─ 04-linkedin/
+│ └─ 05-blog/
 ├─ context/
-│  ├─ empresa.md
-│  ├─ posicionamento.md
-│  ├─ servicos.md
-│  ├─ publico-alvo.md
-│  ├─ concorrencia.md
-│  ├─ metas.md
-│  └─ restricoes.md
+│ ├─ empresa.md
+│ ├─ posicionamento.md
+│ ├─ servicos.md
+│ ├─ publico-alvo.md
+│ ├─ concorrencia.md
+│ ├─ metas.md
+│ └─ restricoes.md
 ├─ tasks/
-│  ├─ exemplo-depoimentos.json
-│  ├─ exemplo-seo.json
-│  └─ exemplo-plano-90-dias.json
+│ ├─ exemplo-plano-90-dias.json
+│ ├─ exemplo-depoimentos.json
+│ ├─ exemplo-cases.json
+│ ├─ exemplo-seo.json
+│ ├─ exemplo-linkedin.json
+│ └─ exemplo-blog.json
 ├─ outputs/
-│  └─ .gitkeep
+│ └─ .gitkeep
 ├─ scripts/
-│  ├─ run_agent.py
-│  └─ orchestrate.py
+│ ├─ run_agent.py
+│ └─ orchestrate.py
 ├─ .env.example
 ├─ .gitignore
 ├─ requirements.txt
@@ -48,21 +51,41 @@ higilabor-agents/
 4. O script `run_agent.py` lê o agente + contexto + tarefa, monta o prompt e salva a saída em `/outputs`.
 5. O script `orchestrate.py` executa o Agente 0 e encadeia os demais.
 
+## Payload oficial das tasks
+
+Todas as tasks seguem o mesmo envelope JSON:
+
+```json
+{
+  "agent_id": "nome-do-agente",
+  "schema_version": "1.0",
+  "task": "descrição opcional da tarefa",
+  "inputs": {}
+}
+```
+
+- **`agent_id`**: ID do agente alvo (ex: `04-linkedin`)
+- **`schema_version`**: sempre `"1.0"` nesta versão
+- **`task`**: descrição legivel da tarefa (opcional, para rastreabilidade)
+- **`inputs`**: objeto com os campos definidos no `input-schema.json` do agente
+
+Os campos obrigatórios de `inputs` para cada agente estão documentados em `agents/<id>/input-schema.json`. Veja exemplos prontos em `tasks/`.
+
 ## Instalação
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env
-# Preencha OPENAI_API_KEY no .env
+cp .env.example .env  # Preencha OPENAI_API_KEY no .env
 ```
 
 ## Rodar um agente
 
 ```bash
 python scripts/run_agent.py tasks/exemplo-depoimentos.json
-python scripts/run_agent.py tasks/exemplo-seo.json
+python scripts/run_agent.py tasks/exemplo-linkedin.json
+python scripts/run_agent.py tasks/exemplo-blog.json
 ```
 
 ## Rodar o orquestrador

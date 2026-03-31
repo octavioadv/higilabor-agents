@@ -1,106 +1,285 @@
-import os
-import sys
+import argparse
 import json
+import os
+import re
+import sys
+from datetime import datetime, timezone
 from pathlib import Path
-from datetime import datetime
+
 from dotenv import load_dotenv
+from jsonschema import Draft202012Validator
 from openai import OpenAI
 
-load_dotenv()
+# ---------------------------------------------------------------------------
+# Helpers: leitura segura
+# ---------------------------------------------------------------------------
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-AGENTS_DIR = BASE_DIR / "agents"
-CONTEXT_DIR = BASE_DIR / "context"
-OUTPUTS_DIR = BASE_DIR / "outputs"
-
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
-API_KEY = os.getenv("OPENAI_API_KEY")
-
-if not API_KEY:
-    raise RuntimeError("OPENAI_API_KEY não encontrada no ambiente.")
-
-client = OpenAI(api_key=API_KEY)
-
-
-def read_text(path: Path) -> str:
-    if not path.exists():
-        return ""
-    return path.read_text(encoding="utf-8")
-
-
-def load_context() -> str:
-    context_parts = []
-    for file in sorted(CONTEXT_DIR.glob("*.md")):
-        content = read_text(file)
-        context_parts.append(f"\n## CONTEXTO: {file.name}\n{content}")
-    return "\n".join(context_parts)
-
-
-def load_task(task_path: Path) -> dict:
-    with open(task_path, "r", encoding="utf-8") as f:
+def load_json(path: Path) -> dict:
+    with path.open("r", encoding="utf-8") as f:
         return json.load(f)
 
 
-def build_prompt(agent_md: str, context_md: str, task_data: dict) -> str:
-    return f"""
-Você está executando um agente operacional da Higilabor.
-
-# ESPECIFICAÇÃO DO AGENTE
-{agent_md}
-
-# CONTEXTO INSTITUCIONAL
-{context_md}
-
-# TAREFA
-{json.dumps(task_data, ensure_ascii=False, indent=2)}
-
-# INSTRUÇÕES FINAIS
-- produza uma saída pronta para uso empresarial
-- seja específico
-- respeite as regras do agente
-- organize a resposta em blocos claros
-- não invente fatos
-"""
+def load_text_if_exists(path: Path) -> str:
+    if path.exists():
+        return path.read_text(encoding="utf-8").strip()
+    return ""
 
 
-def generate_output(prompt: str) -> str:
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": prompt}]
+# ---------------------------------------------------------------------------
+# Validacao do envelope da task
+# ---------------------------------------------------------------------------
+
+def validate_task_envelope(task_data: dict) -> None:
+    for key in ["agent_id", "schema_version", "inputs"]:
+        if key not in task_data:
+            raise ValueError(f"Task invalida: campo obrigatorio ausente '{key}'")
+    if not isinstance(task_data["agent_id"], str) or not task_data["agent_id"].strip():
+        raise ValueError("Task invalida: 'agent_id' deve ser string nao vazia")
+    if not isinstance(task_data["schema_version"], str) or not task_data["schema_version"].strip():
+        raise ValueError("Task invalida: 'schema_version' deve ser string nao vazia")
+    if not isinstance(task_data["inputs"], dict):
+        raise ValueError("Task invalida: 'inputs' deve ser um objeto JSON")
+
+
+# ---------------------------------------------------------------------------
+# Validacao com JSON Schema
+# ---------------------------------------------------------------------------
+
+def validate_with_schema(instance: dict, schema: dict, label: str) -> None:
+    validator = Draft202012Validator(schema)
+    errors = sorted(validator.iter_errors(instance), key=lambda e: e.path)
+    if not errors:
+        return
+    messages = []
+    for err in errors:
+        field_path = ".".join(str(p) for p in err.path) or ""
+        messages.append(f"- {label}: campo '{field_path}': {err.message}")
+    raise ValueError("\n".join(messages))
+
+
+# ---------------------------------------------------------------------------
+# Carregamento dos arquivos do agente
+# ---------------------------------------------------------------------------
+
+def load_agent_files(agent_dir: Path) -> dict:
+    return {
+        "agent_md": load_text_if_exists(agent_dir / "agent.md"),
+        "templates_md": load_text_if_exists(agent_dir / "templates.md"),
+        "checklist_md": load_text_if_exists(agent_dir / "checklist.md"),
+        "input_schema": load_json(agent_dir / "input-schema.json"),
+        "output_schema": load_json(agent_dir / "output-schema.json"),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Contexto global
+# ---------------------------------------------------------------------------
+
+def load_global_context(context_dir: Path) -> str:
+    if not context_dir.exists():
+        return ""
+    parts = []
+    for file in sorted(context_dir.glob("*.md")):
+        content = file.read_text(encoding="utf-8").strip()
+        if content:
+            parts.append(f"# {file.name}\n{content}")
+    return "\n\n".join(parts)
+
+
+# ---------------------------------------------------------------------------
+# Montagem do prompt
+# ---------------------------------------------------------------------------
+
+def build_messages(task_data: dict, agent_files: dict, global_context: str) -> list:
+    system_parts = [
+        "Voce e um agente especializado do sistema Higilabor.",
+        "Responda exclusivamente com JSON valido.",
+        "Nao use markdown.",
+        "Nao use blocos de codigo.",
+        "Nao escreva comentarios fora do JSON.",
+        "A saida deve obedecer exatamente ao output schema fornecido."
+    ]
+    if agent_files["agent_md"]:
+        system_parts.append("\n# AGENT\n" + agent_files["agent_md"])
+    if global_context:
+        system_parts.append("\n# CONTEXT\n" + global_context)
+    if agent_files["templates_md"]:
+        system_parts.append("\n# TEMPLATE\n" + agent_files["templates_md"])
+    if agent_files["checklist_md"]:
+        system_parts.append("\n# CHECKLIST\n" + agent_files["checklist_md"])
+    system_parts.append(
+        "\n# OUTPUT_SCHEMA\n" + json.dumps(agent_files["output_schema"], ensure_ascii=False, indent=2)
     )
-    return response.choices[0].message.content
+    user_payload = {
+        "task": task_data.get("task", ""),
+        "inputs": task_data["inputs"]
+    }
+    return [
+        {"role": "system", "content": "\n\n".join(system_parts)},
+        {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False, indent=2)}
+    ]
 
 
-def save_output(agent_id: str, content: str) -> Path:
-    folder = OUTPUTS_DIR / datetime.now().strftime("%Y-%m")
-    folder.mkdir(parents=True, exist_ok=True)
+# ---------------------------------------------------------------------------
+# Chamada ao modelo
+# ---------------------------------------------------------------------------
 
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    file_path = folder / f"{agent_id}-{timestamp}.md"
-    file_path.write_text(content, encoding="utf-8")
-    return file_path
+def call_model(messages: list, model: str) -> str:
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=0.2,
+    )
+    return response.choices[0].message.content or ""
 
+
+# ---------------------------------------------------------------------------
+# Parse seguro da saida JSON do modelo
+# ---------------------------------------------------------------------------
+
+def extract_json_text(raw_text: str) -> str:
+    text = raw_text.strip()
+    fence_match = re.search(r"```(?:json)?\s*(\{.*\}|\[.*\])\s*```", text, re.DOTALL)
+    if fence_match:
+        return fence_match.group(1).strip()
+    if text.startswith("{") or text.startswith("["):
+        return text
+    obj_match = re.search(r"(\{.*\})", text, re.DOTALL)
+    if obj_match:
+        return obj_match.group(1).strip()
+    raise ValueError("Resposta do modelo nao contem JSON valido detectavel")
+
+
+def parse_model_json(raw_text: str) -> dict:
+    json_text = extract_json_text(raw_text)
+    try:
+        return json.loads(json_text)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Saida invalida: JSON malformado na linha {e.lineno}, coluna {e.colno}: {e.msg}")
+
+
+# ---------------------------------------------------------------------------
+# Bloco 1: Geracao do run_id e diretorio de execucao
+# ---------------------------------------------------------------------------
+
+def create_run_dir(repo_root: Path, agent_id: str) -> tuple[str, Path]:
+    now = datetime.now(timezone.utc)
+    timestamp = now.strftime("%Y%m%d-%H%M%S")
+    run_id = f"run-{timestamp}-{agent_id}"
+    month_dir = now.strftime("%Y-%m")
+    run_dir = repo_root / "outputs" / month_dir / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+    return run_id, run_dir
+
+
+# ---------------------------------------------------------------------------
+# Bloco 2: Salvar artefatos da execucao
+# ---------------------------------------------------------------------------
+
+def save_artifacts(
+    run_dir: Path,
+    raw_output: str,
+    parsed_output: dict,
+    meta: dict,
+) -> None:
+    (run_dir / "raw.md").write_text(raw_output, encoding="utf-8")
+    with (run_dir / "parsed.json").open("w", encoding="utf-8") as f:
+        json.dump(parsed_output, f, ensure_ascii=False, indent=2)
+    with (run_dir / "meta.json").open("w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+
+
+# ---------------------------------------------------------------------------
+# Bloco 3: Salvar meta de erro auditavel
+# ---------------------------------------------------------------------------
+
+def save_error_meta(run_dir, meta: dict, error_msg: str) -> None:
+    if run_dir is None:
+        return
+    meta["success"] = False
+    meta["error"] = error_msg
+    meta.setdefault("finished_at", datetime.now(timezone.utc).isoformat())
+    try:
+        with (run_dir / "meta.json").open("w", encoding="utf-8") as f:
+            json.dump(meta, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+
+# ---------------------------------------------------------------------------
+# Ponto de entrada principal
+# ---------------------------------------------------------------------------
 
 def main():
-    if len(sys.argv) < 2:
-        raise SystemExit("Uso: python scripts/run_agent.py tasks/exemplo-depoimentos.json")
+    load_dotenv()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--task", required=True, help="Caminho para o arquivo de task JSON")
+    args = parser.parse_args()
 
-    task_path = Path(sys.argv[1]).resolve()
-    task_data = load_task(task_path)
+    repo_root = Path(__file__).resolve().parents[1]
+    task_path = Path(args.task).resolve()
 
-    agent_id = task_data["agent_id"]
-    agent_md_path = AGENTS_DIR / agent_id / "agent.md"
-    agent_md = read_text(agent_md_path)
-    context_md = load_context()
+    run_dir = None
+    meta = {}
 
-    if not agent_md.strip():
-        raise RuntimeError(f"agent.md não encontrado para {agent_id}")
+    try:
+        if not task_path.exists():
+            raise FileNotFoundError(f"Task nao encontrada: {task_path}")
 
-    prompt = build_prompt(agent_md, context_md, task_data)
-    output_text = generate_output(prompt)
-    saved_file = save_output(agent_id, output_text)
+        task_data = load_json(task_path)
+        validate_task_envelope(task_data)
 
-    print(f"Saída salva em: {saved_file}")
+        agent_id = task_data["agent_id"]
+        agent_dir = repo_root / "agents" / agent_id
+        if not agent_dir.exists():
+            raise FileNotFoundError(f"Diretorio do agente nao encontrado: {agent_dir}")
+
+        agent_files = load_agent_files(agent_dir)
+        validate_with_schema(task_data["inputs"], agent_files["input_schema"], "input-schema")
+
+        model = os.getenv("OPENAI_MODEL", "gpt-4o")
+        run_id, run_dir = create_run_dir(repo_root, agent_id)
+        start_ts = datetime.now(timezone.utc)
+
+        meta = {
+            "run_id": run_id,
+            "agent_id": agent_id,
+            "schema_version": task_data["schema_version"],
+            "task_file": str(task_path.relative_to(repo_root)),
+            "model": model,
+            "started_at": start_ts.isoformat(),
+            "input_valid": True,
+        }
+
+        global_context = load_global_context(repo_root / "context")
+        messages = build_messages(task_data, agent_files, global_context)
+
+        raw_output = call_model(messages, model)
+        if not raw_output.strip():
+            raise ValueError("Saida vazia do modelo")
+
+        parsed_output = parse_model_json(raw_output)
+        validate_with_schema(parsed_output, agent_files["output_schema"], "output-schema")
+
+        finished_at = datetime.now(timezone.utc)
+        duration_ms = int((finished_at - start_ts).total_seconds() * 1000)
+
+        meta.update({
+            "finished_at": finished_at.isoformat(),
+            "duration_ms": duration_ms,
+            "output_valid": True,
+            "success": True,
+        })
+
+        save_artifacts(run_dir, raw_output, parsed_output, meta)
+        print(f"OK: execucao {run_id} salva em {run_dir}")
+
+    except Exception as exc:
+        error_msg = str(exc)
+        save_error_meta(run_dir, meta, error_msg)
+        print(f"ERRO: {error_msg}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

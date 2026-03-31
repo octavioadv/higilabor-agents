@@ -1,0 +1,15 @@
+{
+  "agent_id": "02-cases",
+  "schema_version": "1.0",
+  "task": "Estruturar case de sucesso para uso comercial e institucional",
+  "inputs": {
+    "cliente_nome": "Clínica Santa Helena",
+    "setor": "hospitalar",
+    "servico": "PGR, PCMSO e apoio em gestão documental de SST",
+    "problema": "A clínica tinha documentação de SST dispersa, dificuldade para acompanhar vencimentos e insegurança quanto à conformidade em auditorias internas.",
+    "acoes": "A Higilabor reorganizou os documentos, atualizou os programas obrigatórios, criou rotina de acompanhamento e orientou a equipe administrativa sobre os pontos críticos.",
+    "resultado": "A clínica passou a ter controle centralizado dos documentos, reduziu atrasos operacionais e ganhou mais segurança para responder a exigências internas e externas.",
+    "citacao_cliente": "Hoje temos mais clareza sobre o que precisa ser feito e mais segurança para manter tudo em ordem.",
+    "canal_destino": ["site", "linkedin", "proposta"]
+  }
+}
