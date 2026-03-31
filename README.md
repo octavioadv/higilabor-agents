@@ -1,80 +1,98 @@
 # Higilabor Agents
 
-> **Higilabor Growth OS** — sistema de agentes de IA para gerar prova social, cases, SEO local e conteúdo comercial com consistência e escala.
+> **Higilabor Growth OS** — sistema multiagente para operação de marketing, autoridade, conteúdo, SEO e vendas consultivas da Higilabor.
+
+## Objetivo
+
+Transformar diagnósticos estratégicos em execução contínua por agentes especializados, com contexto institucional centralizado, versionamento em GitHub e outputs reaproveitáveis.
 
 ## Estrutura do Repositório
 
 ```
 higilabor-agents/
-├─ agents/              ← o que cada agente sabe fazer
+├─ agents/
 │  ├─ 00-orquestrador/
 │  ├─ 01-depoimentos/
 │  ├─ 02-cases/
-│  └─ 03-seo-local/
-├─ context/             ← quem é a Higilabor de verdade
+│  ├─ 03-seo-local/
+│  ├─ 04-linkedin/
+│  └─ 05-blog/
+├─ context/
 │  ├─ empresa.md
 │  ├─ posicionamento.md
 │  ├─ servicos.md
 │  ├─ publico-alvo.md
 │  ├─ concorrencia.md
+│  ├─ metas.md
 │  └─ restricoes.md
-├─ tasks/               ← o pedido concreto
-│  └─ exemplo-task.json
-├─ outputs/             ← o que foi produzido
-│  └─ 2026-03/
-├─ scripts/             ← quem executa
+├─ tasks/
+│  ├─ exemplo-depoimentos.json
+│  ├─ exemplo-seo.json
+│  └─ exemplo-plano-90-dias.json
+├─ outputs/
+│  └─ .gitkeep
+├─ scripts/
 │  ├─ run_agent.py
 │  └─ orchestrate.py
-├─ .env
+├─ .env.example
+├─ .gitignore
 ├─ requirements.txt
 └─ README.md
 ```
 
-## Como Funciona
+## Como funciona
 
-1. **`agents/`** — cada pasta é um agente com contrato claro: missão, entradas, saídas, regras.
-2. **`context/`** — arquivos fixos com a identidade real da Higilabor. Todo agente lê isso.
-3. **`tasks/`** — o pedido concreto em JSON: qual agente rodar e com quais parâmetros.
-4. **`scripts/`** — junta agente + contexto + tarefa e chama o modelo da OpenAI.
-5. **`outputs/`** — respostas salvas por data para rastreabilidade.
+1. Cada agente possui: missão, regras, entradas esperadas, saídas obrigatórias e critérios de qualidade.
+2. O contexto institucional da Higilabor fica centralizado em `/context`.
+3. Cada tarefa é definida em um arquivo JSON dentro de `/tasks`.
+4. O script `run_agent.py` lê o agente + contexto + tarefa, monta o prompt e salva a saída em `/outputs`.
+5. O script `orchestrate.py` executa o Agente 0 e encadeia os demais.
 
-## Como Rodar
+## Instalação
 
 ```bash
-# Instalar dependências
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-
-# Configurar chave da OpenAI
-export OPENAI_API_KEY="sua-chave-aqui"
-
-# Rodar um agente
-python scripts/run_agent.py
+cp .env.example .env
+# Preencha OPENAI_API_KEY no .env
 ```
 
-## Agentes Disponíveis
+## Rodar um agente
 
-| # | Agente | Missão |
-|---|--------|--------|
-| 00 | Orquestrador | Coordena os demais agentes e quebra metas em execuções |
-| 01 | Depoimentos | Coleta e transforma depoimentos em prova social de alta conversão |
-| 02 | Cases | Estrutura casos de sucesso em materiais comerciais |
-| 03 | SEO Local | Gera conteúdo otimizado para ranqueamento local da Higilabor |
-
-## Fluxo de Trabalho
-
-```
-Fase 1 (simples): rodar agentes manualmente via run_agent.py
-Fase 2 (semi): tasks padronizadas + outputs organizados + PR review
-Fase 3 (orquestração): agente 00 quebrando metas + execução encadeada
+```bash
+python scripts/run_agent.py tasks/exemplo-depoimentos.json
+python scripts/run_agent.py tasks/exemplo-seo.json
 ```
 
-## Branches
+## Rodar o orquestrador
 
-- `main` — agentes estáveis e aprovados
-- `dev` — testes e experimentos
-- `feat/agente-nome` — novo agente em desenvolvimento
-- `fix/agente-nome` — correção de prompt ou regra
+```bash
+python scripts/orchestrate.py tasks/exemplo-plano-90-dias.json
+```
 
----
+## Agentes
 
-*GitHub é o repositório normativo: auditoria, versionamento e governança. O agente é a combinação de agent.md + context + task.json + script + modelo.*
+| ID | Agente | Função |
+|----|--------|--------|
+| 00 | Orquestrador | Plano estratégico e encadeamento |
+| 01 | Depoimentos | Prova social e coleta |
+| 02 | Cases | Narrativas comerciais |
+| 03 | SEO Local | Páginas e pautas com intenção local |
+| 04 | LinkedIn | Autoridade técnica e posts |
+| 05 | Blog | Conteúdo evergreen e SEO |
+
+## Convenções
+
+- `main`: versão estável
+- `dev`: testes e desenvolvimento
+- `outputs` são salvos por data (`YYYY-MM/`)
+- alterações em agentes devem ser revisadas por PR
+
+## Próximos agentes (v2)
+
+- 06-youtube
+- 07-lead-magnet
+- 08-parcerias-juridicas
+- 09-newsletter
+- 10-verticalizacao-setorial
