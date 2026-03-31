@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "tema": { "type": "string" },
+    "objetivo": { "type": "string" },
+    "publico": { "type": "string" },
+    "estagio_funil": { "type": "string" },
+    "formato": { "type": "string" }
+  }
+}
