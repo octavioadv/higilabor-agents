@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "titulo": { "type": "string" },
+    "introducao": { "type": "string" },
+    "artigo": { "type": "string" },
+    "interlinks": { "type": "array" },
+    "cta": { "type": "string" }
+  }
+}
