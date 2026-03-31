@@ -1,0 +1,12 @@
+{
+  "agent_id": "04-linkedin",
+  "schema_version": "1.0",
+  "task": "Gerar post de autoridade técnica para LinkedIn",
+  "inputs": {
+    "tema": "Empresas só lembram do PCMSO quando o problema já apareceu",
+    "objetivo": "autoridade",
+    "publico": "empresários, gestores de RH e responsáveis por SST",
+    "estagio_funil": "meio",
+    "formato": "texto"
+  }
+}
