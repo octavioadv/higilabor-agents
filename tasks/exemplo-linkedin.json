@@ -1,12 +1,12 @@
 {
   "agent_id": "04-linkedin",
   "schema_version": "1.0",
-  "task": "Criar post de autoridade para o LinkedIn da Higilabor sobre limpeza pós-obra em condomínios residenciais.",
+  "task": "Criar post de autoridade para o LinkedIn da Higilabor sobre falhas no PCMSO e seus riscos trabalhistas.",
   "inputs": {
-    "tema": "limpeza pós-obra em condomínios",
-    "objetivo": "gerar autoridade e atrair gestores de condomínios",
-    "publico": "síndicos e administradoras de condomínios em Uberlândia",
-    "estagio_funil": "topo",
+    "tema": "falhas no PCMSO e autuações da fiscalização",
+    "objetivo": "posicionar a Higilabor como autoridade técnica em SST",
+    "publico": "empresários, gestores de RH e responsáveis por SST em Uberlândia",
+    "estagio_funil": "meio",
     "formato": "post carrossel com até 7 slides"
   }
 }
