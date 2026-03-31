@@ -1,37 +1,61 @@
 # Serviços Higilabor
 
-## 1. Limpeza Geral e Conservação
-- Limpeza periódica de ambientes corporativos
-- Conservação diária (escritórios, corredores, banheiros, refeitórios)
-- SLA: 100% de cobertura nos dias acordados
+A Higilabor é especializada em **Engenharia e Medicina do Trabalho**, oferecendo serviços de SST (Saúde e Segurança do Trabalho) para empresas em Uberlândia e região.
 
-## 2. Higienização Técnica
-- Ambientes críticos: hospitais, clínicas, laboratórios
-- Protocolos de desinfecção e controle de biocontaminação
-- Conformidade ANVISA e normas ABNT
+## 1. Elaboração e Gestão do PCMSO
 
-## 3. Terceirização de Mão de Obra
-- Equipe treinada, uniformizada, documentada
-- Gestão de ponto, folha e substituições
-- Responsabilidade trabalhista integral da Higilabor
-- SLA: cobertura de faltas em até 2h úteis
+- Programa de Controle Médico de Saúde Ocupacional
+- Exames admissionais, periódicos, demissionais e de retorno ao trabalho
+- Atendimento às NR-07 e NR-01
+- Acompanhamento médico especializado em medicina do trabalho
+- SLA: emissão de ASO em até 24h após exame
 
-## 4. Limpeza Pós-Obra
-- Remoção de resíduos de construção
-- Polimento e tratamento de pisos
-- Entrega: ambiente pronto para ocupação
+## 2. Elaboração e Gestão do PGR
 
-## 5. Limpeza de Fachadas e Áreas Externas
-- Lavagem e conservação
-- Inclui trabalho em altura
+- Programa de Gerenciamento de Riscos (NR-01)
+- Levantamento e avaliação de riscos ocupacionais
+- Plano de ação para controle de riscos
+- Atualizações periódicas conforme norma
 
-## 6. Higiene Ocupacional / SST
-- Laudos técnicos
-- Perícias e consultorias
-- Gestão de passivo trabalhista
+## 3. Laudos Técnicos
+
+- LTCAT (Laudo Técnico das Condições Ambientais do Trabalho)
+- PPP (Perfil Profissiográfico Previdenciário)
+- Laudo de Insalubridade e Periculosidade
+- AET (Análise Ergonômica do Trabalho)
+
+## 4. Treinamentos e Capacitações
+
+- NR-05: CIPA e Brigada de Incêndio
+- NR-06: Uso correto de EPIs
+- NR-10: Segurança em Instalações e Serviços em Eletricidade
+- NR-35: Trabalho em Altura
+- DDS (Diálogos Diários de Segurança)
+
+## 5. Perícias e Consultorias
+
+- Perícias trabalhistas e previdenciárias
+- Consultoria para adequação às normas regulamentadoras
+- Gestão de passivo trabalhista relacionado a SST
+- Preparação para auditorias e fiscalizações
+
+## 6. Programas Complementares
+
+- PCMAT (Programa de Condições e Meio Ambiente de Trabalho na Indústria da Construção)
+- PCA (Programa de Conservação Auditiva)
+- PPR (Programa de Proteção Respiratória)
+- Gestão de eSocial - eventos de SST
 
 ## Modelo Comercial
-- Contratos mensais (mínimo 12 meses para desconto)
-- Projetos pontuais (pós-obra, eventos, emergências)
-- Pricing: por métro quadrado ou por posto de trabalho
-- Proposta após visita técnica
+
+- Contratos anuais com gestão contínua de SST
+- Projetos pontuais (laudos, perícias, treinamentos)
+- Pricing: por número de colaboradores ou escopo de serviços
+- Proposta após visita técnica e levantamento preliminar
+
+## Diferenciais Higilabor
+
+- Equipe multidisciplinar (médicos, engenheiros e técnicos de segurança)
+- Atendimento local em Uberlândia com pronto atendimento
+- Experiência em diversos setores (indústria, comércio, serviços)
+- Tecnologia própria para gestão de SST e compliance
