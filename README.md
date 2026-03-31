@@ -66,7 +66,7 @@ Todas as tasks seguem o mesmo envelope JSON:
 
 - **`agent_id`**: ID do agente alvo (ex: `04-linkedin`)
 - **`schema_version`**: sempre `"1.0"` nesta versão
-- **`task`**: descrição legivel da tarefa (opcional, para rastreabilidade)
+- **`task`**: descrição legível da tarefa (opcional, para rastreabilidade)
 - **`inputs`**: objeto com os campos definidos no `input-schema.json` do agente
 
 Os campos obrigatórios de `inputs` para cada agente estão documentados em `agents/<id>/input-schema.json`. Veja exemplos prontos em `tasks/`.
@@ -83,15 +83,15 @@ cp .env.example .env  # Preencha OPENAI_API_KEY no .env
 ## Rodar um agente
 
 ```bash
-python scripts/run_agent.py tasks/exemplo-depoimentos.json
-python scripts/run_agent.py tasks/exemplo-linkedin.json
-python scripts/run_agent.py tasks/exemplo-blog.json
+python scripts/run_agent.py --task tasks/exemplo-depoimentos.json
+python scripts/run_agent.py --task tasks/exemplo-linkedin.json
+python scripts/run_agent.py --task tasks/exemplo-blog.json
 ```
 
 ## Rodar o orquestrador
 
 ```bash
-python scripts/orchestrate.py tasks/exemplo-plano-90-dias.json
+python scripts/orchestrate.py --task tasks/exemplo-plano-90-dias.json
 ```
 
 ## Agentes
