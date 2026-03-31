@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Output do Orquestrador",
+  "type": "object",
+  "required": ["plano_execucao", "criterios_sucesso"],
+  "properties": {
+    "plano_execucao": {
+      "type": "array",
+      "description": "Lista ordenada de etapas do ciclo",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ordem": { "type": "integer" },
+          "agente": { "type": "string" },
+          "objetivo": { "type": "string" },
+          "insumos": { "type": "array", "items": { "type": "string" } },
+          "prazo_dias": { "type": "integer" }
+        }
+      }
+    },
+    "criterios_sucesso": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Critérios mensuráveis para avaliar o ciclo"
+    },
+    "dependencias": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Conflitos ou dependências identificadas entre agentes"
+    },
+    "resumo_executivo": {
+      "type": "string",
+      "description": "Resumo do plano para aprovação"
+    }
+  }
+}
