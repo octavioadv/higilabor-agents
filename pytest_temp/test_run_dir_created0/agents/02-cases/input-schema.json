@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Input do Agente de Cases",
+  "type": "object",
+  "required": ["cliente_nome", "setor", "servico", "problema", "resultado"],
+  "properties": {
+    "cliente_nome": {
+      "type": "string",
+      "description": "Nome ou razão social do cliente"
+    },
+    "setor": {
+      "type": "string",
+      "description": "Setor de atuação (ex: hospitalar, industrial, público)"
+    },
+    "servico": {
+      "type": "string",
+      "description": "Serviço Higilabor prestado"
+    },
+    "problema": {
+      "type": "string",
+      "description": "Problema ou desafio que o cliente enfrentava"
+    },
+    "acoes": {
+      "type": "string",
+      "description": "Ações realizadas pela equipe Higilabor"
+    },
+    "resultado": {
+      "type": "string",
+      "description": "Resultado concreto ou percebido"
+    },
+    "citacao_cliente": {
+      "type": "string",
+      "description": "Citação direta do cliente (opcional)"
+    },
+    "canal_destino": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["site", "linkedin", "proposta", "pitch", "instagram"]
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "agent_id": "05-blog",
+  "schema_version": "1.0",
+  "task": "Gerar artigo evergreen com foco em autoridade e conversão consultiva",
+  "inputs": {
+    "tema": "Como identificar falhas no PCMSO antes que elas virem passivo trabalhista",
+    "palavra_chave": "falhas no PCMSO",
+    "objetivo": "conversao",
+    "publico": "empresários, gestores de RH e responsáveis por saúde e segurança do trabalho",
+    "profundidade": "intermediario"
+  }
+}

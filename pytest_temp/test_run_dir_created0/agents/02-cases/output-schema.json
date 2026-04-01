@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Output do Agente de Cases",
+  "type": "object",
+  "required": ["titulo", "resumo_executivo", "narrativa_completa", "cta"],
+  "properties": {
+    "titulo": {
+      "type": "string",
+      "description": "Título do case (ex: Como a Higilabor reduziu o risco trabalhista na Indústria X)"
+    },
+    "resumo_executivo": {
+      "type": "string",
+      "description": "Resumo em 3 linhas: problema, solução, resultado"
+    },
+    "narrativa_completa": {
+      "type": "string",
+      "description": "Case completo em estrutura problema-solução-impacto (400-800 palavras)"
+    },
+    "metricas": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Dados e números mensuráveis do resultado"
+    },
+    "citacao": {
+      "type": "string",
+      "description": "Citação do cliente (real ou estruturada com base nos fatos)"
+    },
+    "cta": {
+      "type": "string",
+      "description": "Call-to-action ao final do case"
+    },
+    "versao_curta": {
+      "type": "string",
+      "description": "Versão resumida para LinkedIn ou proposta (ate 150 palavras)"
+    }
+  }
+}

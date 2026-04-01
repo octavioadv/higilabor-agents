@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Input do Agente SEO Local",
+  "type": "object",
+  "required": ["servico_tema", "tipo_conteudo", "objetivo"],
+  "properties": {
+    "servico_tema": {
+      "type": "string",
+      "description": "Serviço ou tema principal do conteúdo (ex: limpeza industrial, higienização hospitalar)"
+    },
+    "cidade": {
+      "type": "string",
+      "description": "Cidade alvo (default: Uberlândia)",
+      "default": "Uberlândia"
+    },
+    "regiao": {
+      "type": "string",
+      "description": "Região alvo (default: Triângulo Mineiro)",
+      "default": "Triângulo Mineiro"
+    },
+    "tipo_conteudo": {
+      "type": "string",
+      "enum": ["pagina-servico", "artigo-blog", "ficha-gmb", "meta-tags", "faq"],
+      "description": "Formato do conteúdo a ser gerado"
+    },
+    "publico_alvo": {
+      "type": "string",
+      "description": "Perfil da pessoa que fará a busca (ex: gerente de facilities, administrador hospitalar)"
+    },
+    "objetivo": {
+      "type": "string",
+      "enum": ["ranqueamento", "conversao", "autoridade"],
+      "description": "Objetivo principal do conteúdo"
+    },
+    "palavras_chave_existentes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Palavras-chave já usadas (para evitar canibalização)"
+    }
+  }
+}

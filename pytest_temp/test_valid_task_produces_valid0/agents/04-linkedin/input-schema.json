@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Input do Agente LinkedIn",
+  "type": "object",
+  "required": ["tema", "objetivo", "publico"],
+  "properties": {
+    "tema": {
+      "type": "string",
+      "description": "Tema central do post (ex: higiene industrial, NR-12, gestão de SST)"
+    },
+    "objetivo": {
+      "type": "string",
+      "enum": ["autoridade", "relacionamento", "conversao", "educacao"],
+      "description": "Objetivo principal do post"
+    },
+    "publico": {
+      "type": "string",
+      "description": "Perfil do público-alvo (ex: gerentes de RH, técnicos de segurança)"
+    },
+    "estagio_funil": {
+      "type": "string",
+      "enum": ["topo", "meio", "fundo"],
+      "description": "Estágio do funil de marketing"
+    },
+    "formato": {
+      "type": "string",
+      "enum": ["carrossel", "texto", "poll", "video-script"],
+      "description": "Formato do conteúdo a ser gerado"
+    }
+  },
+  "additionalProperties": false
+}

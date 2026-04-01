@@ -1,0 +1,18 @@
+{
+  "mensagem_solicitacao": "Olá, gostaríamos de compartilhar sua experiência.",
+  "roteiro_perguntas": [
+    "Qual problema enfrentava antes?",
+    "Como a Higilabor ajudou?",
+    "Qual resultado concreto?",
+    "Recomendaria a outros?",
+    "Algo mais a acrescentar?"
+  ],
+  "depoimento_curto": "A Higilabor transformou nossa gestão de SST.",
+  "depoimento_expandido": "Antes da Higilabor, nossa documentação era desorganizada. Após a implementação do PGR e LTCAT, alcançamos conformidade total.",
+  "cta_sugerido": "Conheça os serviços da Higilabor",
+  "hashtags": [
+    "#SST",
+    "#Higilabor",
+    "#SegurançaDoTrabalho"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "agent_id": "00-orquestrador",
+  "schema_version": "1.0",
+  "task": "Montar plano de 90 dias para fortalecer presença digital, autoridade e geração de demanda da Higilabor.",
+  "inputs": {
+    "objetivo_ciclo": "Fortalecer presença digital e gerar demanda qualificada em 90 dias",
+    "duracao_dias": 90,
+    "restricoes": [
+      "não inventar provas",
+      "manter tom técnico",
+      "priorizar reaproveitamento entre agentes"
+    ],
+    "contexto_ciclo_anterior": "Nenhum ciclo anterior — primeira execução do Growth OS.",
+    "agentes_disponiveis": [
+      "01-depoimentos",
+      "02-cases",
+      "03-seo-local",
+      "04-linkedin",
+      "05-blog"
+    ]
+  }
+}

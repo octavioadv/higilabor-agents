@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Output do Agente SEO Local",
+  "type": "object",
+  "required": ["palavras_chave", "titulo_seo", "meta_description", "conteudo"],
+  "properties": {
+    "palavras_chave": {
+      "type": "object",
+      "properties": {
+        "primaria": { "type": "string" },
+        "secundarias": { "type": "array", "items": { "type": "string" } },
+        "long_tail": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "titulo_seo": {
+      "type": "string",
+      "description": "Título SEO otimizado (ate 60 caracteres)"
+    },
+    "meta_description": {
+      "type": "string",
+      "description": "Meta description otimizada (ate 155 caracteres)"
+    },
+    "estrutura_headers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nivel": { "type": "string", "enum": ["H1", "H2", "H3"] },
+          "texto": { "type": "string" }
+        }
+      }
+    },
+    "conteudo": {
+      "type": "string",
+      "description": "Texto completo otimizado para SEO"
+    },
+    "cta_local": {
+      "type": "string",
+      "description": "Call-to-action com informações locais (endereço/telefone)"
+    },
+    "link_building_sugestoes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Sites e direìtórios locais para link building"
+    }
+  }
+}

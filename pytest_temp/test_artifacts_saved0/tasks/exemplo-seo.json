@@ -1,0 +1,13 @@
+{
+  "agent_id": "03-seo-local",
+  "schema_version": "1.0",
+  "task": "Criar arquitetura de página SEO para PGR em Uberlandia.",
+  "inputs": {
+    "servico_tema": "PGR — Programa de Gerenciamento de Riscos",
+    "cidade": "Uberlandia",
+    "regiao": "Triângulo Mineiro",
+    "tipo_conteudo": "pagina-servico",
+    "publico_alvo": "Empresários, RH e gestores operacionais",
+    "objetivo": "conversao"
+  }
+}

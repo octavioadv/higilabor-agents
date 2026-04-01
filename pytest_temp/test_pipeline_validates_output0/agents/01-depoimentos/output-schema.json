@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Output do Agente de Depoimentos",
+  "type": "object",
+  "required": ["mensagem_solicitacao", "roteiro_perguntas", "depoimento_curto", "depoimento_expandido"],
+  "properties": {
+    "mensagem_solicitacao": {
+      "type": "string",
+      "description": "Mensagem curta para solicitar depoimento ao cliente (email/WhatsApp)"
+    },
+    "roteiro_perguntas": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "5 a 7 perguntas para guiar o depoimento"
+    },
+    "depoimento_curto": {
+      "type": "string",
+      "description": "Versão resumida para site ou LinkedIn (até 150 palavras)"
+    },
+    "depoimento_expandido": {
+      "type": "string",
+      "description": "Versão completa para proposta comercial (até 400 palavras)"
+    },
+    "cta_sugerido": {
+      "type": "string",
+      "description": "Call-to-action recomendado após o depoimento"
+    },
+    "hashtags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Hashtags para LinkedIn (se aplicável)"
+    }
+  }
+}

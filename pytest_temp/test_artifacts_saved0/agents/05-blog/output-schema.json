@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Output do Agente Blog",
+  "type": "object",
+  "required": ["titulo", "introducao", "artigo", "cta"],
+  "properties": {
+    "titulo": {
+      "type": "string",
+      "description": "Título SEO otimizado do artigo (até 60 caracteres)"
+    },
+    "introducao": {
+      "type": "string",
+      "description": "Parágrafo de abertura com gancho e palavra-chave (até 150 palavras)"
+    },
+    "artigo": {
+      "type": "string",
+      "description": "Corpo completo do artigo com títulos H2/H3 e conteúdo (800-1.500 palavras)"
+    },
+    "interlinks": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Sugestões de links internos para outros conteúdos do site Higilabor"
+    },
+    "cta": {
+      "type": "string",
+      "description": "Call-to-action ao final do artigo"
+    }
+  },
+  "additionalProperties": false
+}

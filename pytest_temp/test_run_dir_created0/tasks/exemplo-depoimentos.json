@@ -1,0 +1,14 @@
+{
+  "agent_id": "01-depoimentos",
+  "schema_version": "1.0",
+  "task": "Criar fluxo inicial de coleta de depoimentos para clientes empresariais da Higilabor.",
+  "inputs": {
+    "nome_cliente": "Cliente empresarial genérico",
+    "segmento": "Indústria",
+    "servico_prestado": "PGR e LTCAT",
+    "problema": "Documentação desorganizada e insegurança quanto à consistência técnica",
+    "resultado_obtido": "Maior segurança documental e confiança na condução da SST",
+    "canal_publicacao": ["site", "linkedin", "proposta comercial"],
+    "contato_autorizado": false
+  }
+}

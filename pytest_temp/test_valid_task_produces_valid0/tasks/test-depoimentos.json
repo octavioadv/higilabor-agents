@@ -1,0 +1,16 @@
+{
+  "agent_id": "01-depoimentos",
+  "schema_version": "1.0",
+  "task": "Teste automatizado",
+  "inputs": {
+    "nome_cliente": "Empresa Teste LTDA",
+    "segmento": "Indústria",
+    "servico_prestado": "PGR e LTCAT",
+    "resultado_obtido": "Conformidade total",
+    "canal_publicacao": [
+      "site",
+      "linkedin"
+    ],
+    "contato_autorizado": true
+  }
+}

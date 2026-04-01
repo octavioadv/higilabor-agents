@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Input do Agente Blog",
+  "type": "object",
+  "required": ["tema", "palavra_chave", "objetivo"],
+  "properties": {
+    "tema": {
+      "type": "string",
+      "description": "Tema principal do artigo (ex: higienização hospitalar, NR-32, SST industrial)"
+    },
+    "palavra_chave": {
+      "type": "string",
+      "description": "Palavra-chave principal para SEO (ex: empresa de limpeza hospitalar Uberlandia)"
+    },
+    "objetivo": {
+      "type": "string",
+      "enum": ["ranqueamento", "conversao", "autoridade", "educacao"],
+      "description": "Objetivo principal do artigo"
+    },
+    "publico": {
+      "type": "string",
+      "description": "Perfil do público-alvo (ex: gestores de facilities, RH industrial)"
+    },
+    "profundidade": {
+      "type": "string",
+      "enum": ["introdutorio", "intermediario", "avancado"],
+      "description": "Nível de profundidade técnica do conteúdo"
+    }
+  },
+  "additionalProperties": false
+}

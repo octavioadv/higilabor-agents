@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Input do Agente de Depoimentos",
+  "type": "object",
+  "required": ["nome_cliente", "segmento", "servico_prestado"],
+  "properties": {
+    "nome_cliente": {
+      "type": "string",
+      "description": "Nome completo ou razão social do cliente"
+    },
+    "segmento": {
+      "type": "string",
+      "description": "Setor de atuação do cliente (ex: saúde, indústria, educação)"
+    },
+    "servico_prestado": {
+      "type": "string",
+      "description": "Tipo de serviço Higilabor contratado"
+    },
+    "resultado_obtido": {
+      "type": "string",
+      "description": "Resultado ou benefício concreto gerado pelo serviço"
+    },
+    "canal_publicacao": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["site", "linkedin", "proposta comercial", "google", "instagram"]
+      },
+      "description": "Canais onde o depoimento será publicado"
+    },
+    "contato_autorizado": {
+      "type": "boolean",
+      "description": "Cliente autorizou uso do nome/empresa?",
+      "default": false
+    }
+  }
+}
