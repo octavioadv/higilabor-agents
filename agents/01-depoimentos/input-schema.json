@@ -3,6 +3,7 @@
   "title": "Input do Agente de Depoimentos",
   "type": "object",
   "required": ["nome_cliente", "segmento", "servico_prestado"],
+  "additionalProperties": false,
   "properties": {
     "nome_cliente": {
       "type": "string",
