@@ -3,6 +3,7 @@
   "title": "Input do Orquestrador",
   "type": "object",
   "required": ["objetivo_ciclo"],
+  "additionalProperties": false,
   "properties": {
     "objetivo_ciclo": {
       "type": "string",
