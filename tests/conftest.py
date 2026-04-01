@@ -30,7 +30,7 @@ def tmp_repo(tmp_path):
     shutil.copytree(REPO_ROOT / "scripts", tmp_path / "scripts")
 
     # .env mínimo (sem chave real — testes que precisam da API usam mock)
-    (tmp_path / ".env").write_text("OPENAI_API_KEY=test-key\nOPENAI_MODEL=gpt-4o\n")
+    (tmp_path / ".env").write_text("GEMINI_API_KEY=test-key\nGEMINI_MODEL=gemini-2.5-flash\n")
 
     return tmp_path
 

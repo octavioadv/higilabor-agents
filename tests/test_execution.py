@@ -47,13 +47,10 @@ class TestBuildMessages:
         agent_dir = tmp_repo / "agents" / "01-depoimentos"
         agent_files = load_agent_files(agent_dir)
         global_context = load_global_context(tmp_repo / "context")
-        messages = build_messages(task_data, agent_files, global_context)
+        system_instruction, user_content = build_messages(task_data, agent_files, global_context)
 
-        assert len(messages) == 2
-        assert messages[0]["role"] == "system"
-        assert messages[1]["role"] == "user"
-        assert "Higilabor" in messages[0]["content"]
-        assert "OUTPUT_SCHEMA" in messages[0]["content"]
+        assert "Higilabor" in system_instruction
+        assert "OUTPUT_SCHEMA" in system_instruction
 
     def test_user_message_contains_inputs(self, tmp_repo):
         task_data = {
@@ -64,9 +61,8 @@ class TestBuildMessages:
                        "servico_prestado": "PCMSO"},
         }
         agent_files = load_agent_files(tmp_repo / "agents" / "01-depoimentos")
-        messages = build_messages(task_data, agent_files, "")
+        system_instruction, user_content = build_messages(task_data, agent_files, "")
 
-        user_content = messages[1]["content"]
         assert "ACME Corp" in user_content
         assert "Saúde" in user_content
 
@@ -114,7 +110,7 @@ class TestEndToEndWithMock:
         validate_with_schema(task_data["inputs"], agent_files["input_schema"], "input-schema")
 
         global_context = load_global_context(tmp_repo / "context")
-        messages = build_messages(task_data, agent_files, global_context)
+        system_instruction, user_content = build_messages(task_data, agent_files, global_context)
 
         raw_output = MOCK_DEPOIMENTOS_OUTPUT
         from run_agent import parse_model_json

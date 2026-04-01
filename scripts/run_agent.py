@@ -9,7 +9,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from jsonschema import Draft202012Validator
-from openai import OpenAI
+from google import genai
+from google.genai import types
 
 from utils import load_json, load_text_if_exists, utc_now_iso, logger
 
@@ -86,7 +87,7 @@ def load_global_context(context_dir: Path, allowed_files: list[str] | None = Non
 # ---------------------------------------------------------------------------
 # Montagem do prompt
 # ---------------------------------------------------------------------------
-def build_messages(task_data: dict, agent_files: dict, global_context: str) -> list:
+def build_messages(task_data: dict, agent_files: dict, global_context: str) -> tuple[str, str]:
     system_parts = [
         "Voce e um agente especializado do sistema Higilabor.",
         "Responda exclusivamente com JSON valido conforme o output schema.",
@@ -106,27 +107,30 @@ def build_messages(task_data: dict, agent_files: dict, global_context: str) -> l
         "task": task_data.get("task", ""),
         "inputs": task_data["inputs"]
     }
-    return [
-        {"role": "system", "content": "\n\n".join(system_parts)},
-        {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False, indent=2)}
-    ]
+    
+    system_instruction = "\n\n".join(system_parts)
+    user_content = json.dumps(user_payload, ensure_ascii=False, indent=2)
+    return system_instruction, user_content
 
 
 # ---------------------------------------------------------------------------
 # Chamada ao modelo com retry e backoff exponencial
 # ---------------------------------------------------------------------------
-def call_model(messages: list, model: str, retries: int = 3) -> str:
-    client = OpenAI()
+def call_model(system_instruction: str, user_content: str, model: str, retries: int = 3) -> str:
+    client = genai.Client()
     last_exc = None
     for attempt in range(retries):
         try:
-            response = client.chat.completions.create(
+            response = client.models.generate_content(
                 model=model,
-                messages=messages,
-                temperature=0.2,
-                response_format={"type": "json_object"},
+                contents=user_content,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    temperature=0.2,
+                    response_mime_type="application/json",
+                )
             )
-            return response.choices[0].message.content or ""
+            return response.text or ""
         except Exception as exc:
             last_exc = exc
             wait = 2 ** attempt  # 1s, 2s, 4s
@@ -234,7 +238,7 @@ def main():
         agent_files = load_agent_files(agent_dir)
         validate_with_schema(task_data["inputs"], agent_files["input_schema"], "input-schema")
 
-        model = os.getenv("OPENAI_MODEL", "gpt-4o")
+        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         run_id, run_dir = create_run_dir(repo_root, agent_id)
         start_ts = datetime.now(timezone.utc)
         meta = {
@@ -251,8 +255,8 @@ def main():
             repo_root / "context",
             allowed_files=agent_files["context_files"] or None,
         )
-        messages = build_messages(task_data, agent_files, global_context)
-        raw_output = call_model(messages, model)
+        system_instruction, user_content = build_messages(task_data, agent_files, global_context)
+        raw_output = call_model(system_instruction, user_content, model)
 
         if not raw_output.strip():
             raise ValueError("Saida vazia do modelo")

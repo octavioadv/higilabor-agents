@@ -45,11 +45,11 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Edite `.env` e preencha sua chave OpenAI:
+Edite `.env` e preencha sua chave do Google Gemini:
 
 ```
-OPENAI_API_KEY=sk-sua-chave-aqui
-OPENAI_MODEL=gpt-4o
+GEMINI_API_KEY=sua-chave-aqui
+GEMINI_MODEL=gemini-2.5-flash
 ```
 
 ### 2. Rodar um agente individual
@@ -62,7 +62,7 @@ O que acontece:
 1. Valida o envelope da task (agent_id, schema_version, inputs)
 2. Valida os inputs contra o `input-schema.json` do agente
 3. Monta o prompt com agent.md + context/ + templates + output-schema
-4. Chama a API OpenAI
+4. Chama a API do Google Gemini
 5. Parseia o JSON da resposta
 6. Valida o output contra o `output-schema.json` do agente
 7. Salva artefatos em `outputs/YYYY-MM/run-TIMESTAMP-AGENTE/`:
