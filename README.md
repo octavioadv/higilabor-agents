@@ -1,12 +1,49 @@
 # Higilabor Agents
 
-> **Higilabor Growth OS** — sistema multiagente para operação de marketing, autoridade, conteúdo, SEO e vendas consultivas da Higilabor.
+> **Higilabor Growth OS** — máquina de produção de conteúdo comercialmente útil para geração de demanda qualificada e aumento de vendas pela internet.
 
 ![CI](https://github.com/octavioadv/higilabor-agents/actions/workflows/ci.yml/badge.svg)
 
-## Objetivo
+## Missão oficial
 
-Transformar diagnósticos estratégicos em execução contínua por agentes especializados, com contexto institucional centralizado, versionamento em GitHub e outputs reaproveitáveis.
+Transformar o repositório da Higilabor em uma operação de conteúdo focada em resultado comercial:
+
+- **Páginas de SEO** por serviço (ranqueamento orgânico)
+- **Posts de LinkedIn** com autoridade técnica
+- **Artigos de blog** evergreen e de intenção
+- **Conteúdo recorrente sobre eSocial + SST**
+- **Geração de demanda qualificada** e aumento de pedidos de orçamento pela internet
+
+## North Star KPI
+
+> **Pedidos de orçamento qualificados vindos do orgânico por mês**
+
+Meta inicial: **8/mês**. Esse KPI obriga SEO, LinkedIn, blog e eSocial/SST a convergirem para resultado comercial — não para vaidade de alcance.
+
+→ KPIs completos, fórmulas, metas e fontes de dados: [`context/kpis.md`](context/kpis.md)
+
+## Regra-mãe de priorização
+
+Nenhuma task entra no ciclo se não responder claramente a pelo menos uma destas perguntas:
+
+1. Isso aumenta a chance de **ranqueamento orgânico**?
+2. Isso aumenta a **autoridade digital** da Higilabor?
+3. Isso aumenta a chance de **contato comercial qualificado**?
+
+Se a resposta for "não" para todas, vai para backlog.
+
+## Escopo da V1
+
+**Motores prioritários:**
+
+| Motor | Agente | Meta mensal |
+|-------|--------|-------------|
+| SEO por serviço | 03-seo-local | 2 páginas/mês |
+| LinkedIn | 04-linkedin | 8 posts/mês |
+| Blog | 05-blog | 4 artigos/mês |
+| eSocial + SST | 04 + 05 | 4 peças/mês |
+
+**Escopo secundário:** Depoimentos (01) e Cases (02) continuam como ativos de apoio à conversão — só fazem sentido se reforçarem páginas SEO, posts ou confiança comercial.
 
 ## Estrutura do Repositório
 
@@ -20,6 +57,7 @@ higilabor-agents/
 │  ├─ 04-linkedin/       # Autoridade técnica e posts
 │  └─ 05-blog/           # Conteúdo evergreen e SEO
 ├─ context/              # Contexto institucional centralizado
+│  └─ kpis.md            # ← North Star KPI, metas e regras operacionais
 ├─ tasks/                # Tasks JSON com envelope padronizado
 ├─ tests/                # Testes automatizados (pytest)
 ├─ outputs/              # Saídas organizadas por YYYY-MM/
@@ -112,27 +150,28 @@ Todas as tasks seguem o mesmo envelope JSON:
 
 - **`agent_id`**: ID do agente alvo (ex: `04-linkedin`)
 - **`schema_version`**: sempre `"1.0"` nesta versão
-- **`task`**: descrição legivel da tarefa (opcional, para rastreabilidade)
+- **`task`**: descrição legível da tarefa (opcional, para rastreabilidade)
 - **`inputs`**: objeto com os campos definidos no `input-schema.json` do agente
 
 Os campos obrigatórios de `inputs` para cada agente estão documentados em `agents/<id>/input-schema.json`. Veja exemplos prontos em `tasks/`.
 
 ## Agentes
 
-| ID | Agente | Função |
-|----|--------|--------|
-| 00 | Orquestrador | Plano estratégico e encadeamento |
-| 01 | Depoimentos | Prova social e coleta |
-| 02 | Cases | Narrativas comerciais |
-| 03 | SEO Local | Páginas e pautas com intenção local |
-| 04 | LinkedIn | Autoridade técnica e posts |
-| 05 | Blog | Conteúdo evergreen e SEO |
+| ID | Agente | Função | Prioridade V1 |
+|----|--------|--------|--------------|
+| 00 | Orquestrador | Plano estratégico e encadeamento | ● núcleo |
+| 01 | Depoimentos | Prova social e coleta | ○ apoio |
+| 02 | Cases | Narrativas comerciais | ○ apoio |
+| 03 | SEO Local | Páginas e pautas com intenção local | ● motor |
+| 04 | LinkedIn | Autoridade técnica e posts | ● motor |
+| 05 | Blog | Conteúdo evergreen e SEO | ● motor |
 
 ## Definição de pronto (v1)
 
 - [ ] Input inválido falha antes de qualquer chamada à API
 - [ ] Output inválido é rejeitado antes de ser aceito como resultado
 - [ ] Task válida gera output validado e artefatos salvos
+- [ ] Orquestrador devolve obrigatoriamente: north_star_kpi, kpis_secundarios, metas numéricas, prazo, fonte de dado e responsável
 - [ ] Qualquer pessoa consegue clonar, configurar `.env` e rodar um fluxo básico
 
 ## Convenções
