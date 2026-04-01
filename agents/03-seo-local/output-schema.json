@@ -3,9 +3,11 @@
   "title": "Output do Agente SEO Local",
   "type": "object",
   "required": ["palavras_chave", "titulo_seo", "meta_description", "conteudo"],
+  "additionalProperties": false,
   "properties": {
     "palavras_chave": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "primaria": { "type": "string" },
         "secundarias": { "type": "array", "items": { "type": "string" } },
@@ -36,12 +38,7 @@
     },
     "cta_local": {
       "type": "string",
-      "description": "Call-to-action com informações locais (endereço/telefone)"
-    },
-    "link_building_sugestoes": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Sites e direìtórios locais para link building"
+      "description": "Call-to-action com referência geográfica local"
     }
   }
 }
