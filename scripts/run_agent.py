@@ -7,12 +7,12 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from dotenv import load_dotenv
-from jsonschema import Draft202012Validator
-from google import genai
-from google.genai import types
+from dotenv import load_dotenv  # pyre-ignore
+from jsonschema import Draft202012Validator  # pyre-ignore
+from google import genai  # pyre-ignore
+from google.genai import types  # pyre-ignore
 
-from utils import load_json, load_text_if_exists, utc_now_iso, logger
+from utils import load_json, load_text_if_exists, utc_now_iso, logger  # pyre-ignore
 
 # ---------------------------------------------------------------------------
 # Validacao do envelope da task

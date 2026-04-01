@@ -5,7 +5,7 @@ import json
 import shutil
 from pathlib import Path
 
-import pytest
+import pytest  # pyre-ignore
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -56,7 +56,7 @@ def valid_depoimentos_task(tmp_repo):
         },
     }
     path = tmp_repo / "tasks" / "test-depoimentos.json"
-    path.write_text(json.dumps(task, ensure_ascii=False, indent=2))
+    path.write_text(json.dumps(task, ensure_ascii=False, indent=2), encoding="utf-8")
     return path
 
 
@@ -75,7 +75,7 @@ def valid_orchestrator_task(tmp_repo):
         },
     }
     path = tmp_repo / "tasks" / "test-orchestrator.json"
-    path.write_text(json.dumps(task, ensure_ascii=False, indent=2))
+    path.write_text(json.dumps(task, ensure_ascii=False, indent=2), encoding="utf-8")
     return path
 
 
@@ -84,7 +84,7 @@ def invalid_task_missing_fields(tmp_repo):
     """Task sem campos obrigatórios (falta agent_id, schema_version)."""
     task = {"inputs": {"nome_cliente": "Teste"}}
     path = tmp_repo / "tasks" / "test-invalid-envelope.json"
-    path.write_text(json.dumps(task))
+    path.write_text(json.dumps(task), encoding="utf-8")
     return path
 
 
@@ -101,5 +101,5 @@ def invalid_task_bad_input(tmp_repo):
         },
     }
     path = tmp_repo / "tasks" / "test-invalid-input.json"
-    path.write_text(json.dumps(task, ensure_ascii=False, indent=2))
+    path.write_text(json.dumps(task, ensure_ascii=False, indent=2), encoding="utf-8")
     return path

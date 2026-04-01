@@ -7,12 +7,12 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
+import pytest  # pyre-ignore
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
-from run_agent import (
+from run_agent import (  # pyre-ignore
     build_messages,
     create_run_dir,
     load_agent_files,
@@ -23,7 +23,7 @@ from run_agent import (
     validate_task_envelope,
     validate_with_schema,
 )
-from tests.fixtures import MOCK_DEPOIMENTOS_OUTPUT
+from tests.fixtures import MOCK_DEPOIMENTOS_OUTPUT  # pyre-ignore
 
 
 # ===================================================================
@@ -113,7 +113,7 @@ class TestEndToEndWithMock:
         system_instruction, user_content = build_messages(task_data, agent_files, global_context)
 
         raw_output = MOCK_DEPOIMENTOS_OUTPUT
-        from run_agent import parse_model_json
+        from run_agent import parse_model_json  # pyre-ignore
         parsed_output = parse_model_json(raw_output)
         validate_with_schema(parsed_output, agent_files["output_schema"], "output-schema")
 
@@ -123,7 +123,7 @@ class TestEndToEndWithMock:
 
         # Verificações
         assert (run_dir / "parsed.json").exists()
-        saved = json.loads((run_dir / "parsed.json").read_text())
+        saved = json.loads((run_dir / "parsed.json").read_text(encoding="utf-8"))
         assert "mensagem_solicitacao" in saved
         assert "roteiro_perguntas" in saved
         assert len(saved["roteiro_perguntas"]) >= 5
