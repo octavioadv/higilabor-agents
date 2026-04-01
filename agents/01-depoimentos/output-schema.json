@@ -3,6 +3,7 @@
   "title": "Output do Agente de Depoimentos",
   "type": "object",
   "required": ["mensagem_solicitacao", "roteiro_perguntas", "depoimento_curto", "depoimento_expandido"],
+  "additionalProperties": false,
   "properties": {
     "mensagem_solicitacao": {
       "type": "string",
