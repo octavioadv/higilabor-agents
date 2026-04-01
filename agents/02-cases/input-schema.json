@@ -3,6 +3,7 @@
   "title": "Input do Agente de Cases",
   "type": "object",
   "required": ["cliente_nome", "setor", "servico", "problema", "resultado"],
+  "additionalProperties": false,
   "properties": {
     "cliente_nome": {
       "type": "string",
