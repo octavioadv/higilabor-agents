@@ -76,7 +76,7 @@ def load_global_context(context_dir: Path, allowed_files: list[str] | None = Non
         return ""
     parts = []
     for file in sorted(context_dir.glob("*.md")):
-        if allowed_files and file.name not in allowed_files:
+        if isinstance(allowed_files, list) and file.name not in allowed_files:
             continue
         content = file.read_text(encoding="utf-8").strip()
         if content:
@@ -137,7 +137,9 @@ def call_model(system_instruction: str, user_content: str, model: str, retries: 
             logger.warning(f"call_model tentativa {attempt + 1}/{retries} falhou: {exc} — aguardando {wait}s")
             if attempt < retries - 1:
                 time.sleep(wait)
-    raise last_exc
+    if last_exc is not None:
+        raise last_exc
+    raise RuntimeError("call_model failed sem exceções registradas")
 
 
 # ---------------------------------------------------------------------------
