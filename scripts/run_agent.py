@@ -3,6 +3,7 @@ import json
 import os
 import re
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -10,25 +11,11 @@ from dotenv import load_dotenv
 from jsonschema import Draft202012Validator
 from openai import OpenAI
 
-# ---------------------------------------------------------------------------
-# Helpers: leitura segura
-# ---------------------------------------------------------------------------
-
-def load_json(path: Path) -> dict:
-    with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def load_text_if_exists(path: Path) -> str:
-    if path.exists():
-        return path.read_text(encoding="utf-8").strip()
-    return ""
-
+from utils import load_json, load_text_if_exists, utc_now_iso, logger
 
 # ---------------------------------------------------------------------------
 # Validacao do envelope da task
 # ---------------------------------------------------------------------------
-
 def validate_task_envelope(task_data: dict) -> None:
     for key in ["agent_id", "schema_version", "inputs"]:
         if key not in task_data:
@@ -44,7 +31,6 @@ def validate_task_envelope(task_data: dict) -> None:
 # ---------------------------------------------------------------------------
 # Validacao com JSON Schema
 # ---------------------------------------------------------------------------
-
 def validate_with_schema(instance: dict, schema: dict, label: str) -> None:
     validator = Draft202012Validator(schema)
     errors = sorted(validator.iter_errors(instance), key=lambda e: e.path)
@@ -60,7 +46,6 @@ def validate_with_schema(instance: dict, schema: dict, label: str) -> None:
 # ---------------------------------------------------------------------------
 # Carregamento dos arquivos do agente
 # ---------------------------------------------------------------------------
-
 def load_agent_files(agent_dir: Path) -> dict:
     return {
         "agent_md": load_text_if_exists(agent_dir / "agent.md"),
@@ -68,18 +53,30 @@ def load_agent_files(agent_dir: Path) -> dict:
         "checklist_md": load_text_if_exists(agent_dir / "checklist.md"),
         "input_schema": load_json(agent_dir / "input-schema.json"),
         "output_schema": load_json(agent_dir / "output-schema.json"),
+        "context_files": _load_context_list(agent_dir),
     }
 
 
-# ---------------------------------------------------------------------------
-# Contexto global
-# ---------------------------------------------------------------------------
+def _load_context_list(agent_dir: Path) -> list[str]:
+    """Retorna lista de nomes de arquivos de contexto relevantes para o agente.
+    Lido de agent-context.json se existir, senao usa todos os arquivos."""
+    cfg_path = agent_dir / "agent-context.json"
+    if cfg_path.exists():
+        data = load_json(cfg_path)
+        return data.get("context_files", [])
+    return []  # vazio = carregar tudo (comportamento legado)
 
-def load_global_context(context_dir: Path) -> str:
+
+# ---------------------------------------------------------------------------
+# Contexto global (seletivo por agente)
+# ---------------------------------------------------------------------------
+def load_global_context(context_dir: Path, allowed_files: list[str] | None = None) -> str:
     if not context_dir.exists():
         return ""
     parts = []
     for file in sorted(context_dir.glob("*.md")):
+        if allowed_files and file.name not in allowed_files:
+            continue
         content = file.read_text(encoding="utf-8").strip()
         if content:
             parts.append(f"# {file.name}\n{content}")
@@ -89,15 +86,10 @@ def load_global_context(context_dir: Path) -> str:
 # ---------------------------------------------------------------------------
 # Montagem do prompt
 # ---------------------------------------------------------------------------
-
 def build_messages(task_data: dict, agent_files: dict, global_context: str) -> list:
     system_parts = [
         "Voce e um agente especializado do sistema Higilabor.",
-        "Responda exclusivamente com JSON valido.",
-        "Nao use markdown.",
-        "Nao use blocos de codigo.",
-        "Nao escreva comentarios fora do JSON.",
-        "A saida deve obedecer exatamente ao output schema fornecido."
+        "Responda exclusivamente com JSON valido conforme o output schema.",
     ]
     if agent_files["agent_md"]:
         system_parts.append("\n# AGENT\n" + agent_files["agent_md"])
@@ -121,23 +113,32 @@ def build_messages(task_data: dict, agent_files: dict, global_context: str) -> l
 
 
 # ---------------------------------------------------------------------------
-# Chamada ao modelo
+# Chamada ao modelo com retry e backoff exponencial
 # ---------------------------------------------------------------------------
-
-def call_model(messages: list, model: str) -> str:
+def call_model(messages: list, model: str, retries: int = 3) -> str:
     client = OpenAI()
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=0.2,
-    )
-    return response.choices[0].message.content or ""
+    last_exc = None
+    for attempt in range(retries):
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=0.2,
+                response_format={"type": "json_object"},
+            )
+            return response.choices[0].message.content or ""
+        except Exception as exc:
+            last_exc = exc
+            wait = 2 ** attempt  # 1s, 2s, 4s
+            logger.warning(f"call_model tentativa {attempt + 1}/{retries} falhou: {exc} — aguardando {wait}s")
+            if attempt < retries - 1:
+                time.sleep(wait)
+    raise last_exc
 
 
 # ---------------------------------------------------------------------------
 # Parse seguro da saida JSON do modelo
 # ---------------------------------------------------------------------------
-
 def extract_json_text(raw_text: str) -> str:
     text = raw_text.strip()
     fence_match = re.search(r"```(?:json)?\s*(\{.*\}|\[.*\])\s*```", text, re.DOTALL)
@@ -162,7 +163,6 @@ def parse_model_json(raw_text: str) -> dict:
 # ---------------------------------------------------------------------------
 # Bloco 1: Geracao do run_id e diretorio de execucao
 # ---------------------------------------------------------------------------
-
 def create_run_dir(repo_root: Path, agent_id: str) -> tuple[str, Path]:
     now = datetime.now(timezone.utc)
     timestamp = now.strftime("%Y%m%d-%H%M%S")
@@ -176,7 +176,6 @@ def create_run_dir(repo_root: Path, agent_id: str) -> tuple[str, Path]:
 # ---------------------------------------------------------------------------
 # Bloco 2: Salvar artefatos da execucao
 # ---------------------------------------------------------------------------
-
 def save_artifacts(
     run_dir: Path,
     raw_output: str,
@@ -193,13 +192,12 @@ def save_artifacts(
 # ---------------------------------------------------------------------------
 # Bloco 3: Salvar meta de erro auditavel
 # ---------------------------------------------------------------------------
-
 def save_error_meta(run_dir, meta: dict, error_msg: str) -> None:
     if run_dir is None:
         return
     meta["success"] = False
     meta["error"] = error_msg
-    meta.setdefault("finished_at", datetime.now(timezone.utc).isoformat())
+    meta.setdefault("finished_at", utc_now_iso())
     try:
         with (run_dir / "meta.json").open("w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False, indent=2)
@@ -210,7 +208,6 @@ def save_error_meta(run_dir, meta: dict, error_msg: str) -> None:
 # ---------------------------------------------------------------------------
 # Ponto de entrada principal
 # ---------------------------------------------------------------------------
-
 def main():
     load_dotenv()
     parser = argparse.ArgumentParser()
@@ -219,7 +216,6 @@ def main():
 
     repo_root = Path(__file__).resolve().parents[1]
     task_path = Path(args.task).resolve()
-
     run_dir = None
     meta = {}
 
@@ -241,7 +237,6 @@ def main():
         model = os.getenv("OPENAI_MODEL", "gpt-4o")
         run_id, run_dir = create_run_dir(repo_root, agent_id)
         start_ts = datetime.now(timezone.utc)
-
         meta = {
             "run_id": run_id,
             "agent_id": agent_id,
@@ -252,10 +247,13 @@ def main():
             "input_valid": True,
         }
 
-        global_context = load_global_context(repo_root / "context")
+        global_context = load_global_context(
+            repo_root / "context",
+            allowed_files=agent_files["context_files"] or None,
+        )
         messages = build_messages(task_data, agent_files, global_context)
-
         raw_output = call_model(messages, model)
+
         if not raw_output.strip():
             raise ValueError("Saida vazia do modelo")
 
@@ -264,20 +262,20 @@ def main():
 
         finished_at = datetime.now(timezone.utc)
         duration_ms = int((finished_at - start_ts).total_seconds() * 1000)
-
         meta.update({
             "finished_at": finished_at.isoformat(),
             "duration_ms": duration_ms,
             "output_valid": True,
             "success": True,
         })
-
         save_artifacts(run_dir, raw_output, parsed_output, meta)
+        logger.info(f"execucao_ok run_id={run_id} agent={agent_id} duration_ms={duration_ms}")
         print(f"OK: execucao {run_id} salva em {run_dir}")
 
     except Exception as exc:
         error_msg = str(exc)
         save_error_meta(run_dir, meta, error_msg)
+        logger.error(f"execucao_erro agent={meta.get('agent_id', '?')} error={error_msg}")
         print(f"ERRO: {error_msg}", file=sys.stderr)
         sys.exit(1)
 
