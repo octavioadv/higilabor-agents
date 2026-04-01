@@ -3,6 +3,7 @@
   "title": "Output do Agente de Cases",
   "type": "object",
   "required": ["titulo", "resumo_executivo", "narrativa_completa", "cta"],
+  "additionalProperties": false,
   "properties": {
     "titulo": {
       "type": "string",
