@@ -3,6 +3,7 @@
   "title": "Input do Agente SEO Local",
   "type": "object",
   "required": ["servico_tema", "tipo_conteudo", "objetivo"],
+  "additionalProperties": false,
   "properties": {
     "servico_tema": {
       "type": "string",
