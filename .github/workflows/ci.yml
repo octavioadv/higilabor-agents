@@ -38,7 +38,7 @@ jobs:
 
       - name: Rodar testes (paralelo)
         env:
-          OPENAI_API_KEY: test-key-ci
-          OPENAI_MODEL: gpt-4o
+          GEMINI_API_KEY: test-key-ci
+          GEMINI_MODEL: gemini-2.5-flash
         run: |
           pytest tests/ -v --tb=short -n auto
