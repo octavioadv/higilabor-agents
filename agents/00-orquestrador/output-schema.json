@@ -3,34 +3,77 @@
   "title": "Output do Orquestrador",
   "type": "object",
   "required": ["plano_execucao", "criterios_sucesso"],
+  "additionalProperties": false,
   "properties": {
     "plano_execucao": {
       "type": "array",
+      "minItems": 1,
       "description": "Lista ordenada de etapas do ciclo",
       "items": {
         "type": "object",
+        "required": ["ordem", "agente", "objetivo"],
+        "additionalProperties": false,
         "properties": {
-          "ordem": { "type": "integer" },
-          "agente": { "type": "string" },
-          "objetivo": { "type": "string" },
-          "insumos": { "type": "array", "items": { "type": "string" } },
-          "prazo_dias": { "type": "integer" }
+          "ordem": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "agente": {
+            "type": "string",
+            "minLength": 1
+          },
+          "objetivo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "insumos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "prazo_dias": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                { "type": "integer", "minimum": 1 },
+                { "type": "string", "minLength": 1 }
+              ]
+            },
+            "description": "Dependencias explicitas da etapa atual"
+          },
+          "inputs": {
+            "type": "object",
+            "description": "Payload completo para o input-schema do agente alvo"
+          }
         }
       }
     },
     "criterios_sucesso": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "Critérios mensuráveis para avaliar o ciclo"
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Criterios mensuraveis para avaliar o ciclo"
     },
     "dependencias": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "Conflitos ou dependências identificadas entre agentes"
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Conflitos ou dependencias identificadas entre agentes"
     },
     "resumo_executivo": {
       "type": "string",
-      "description": "Resumo do plano para aprovação"
+      "minLength": 1,
+      "description": "Resumo do plano para aprovacao"
     }
   }
 }
