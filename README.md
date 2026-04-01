@@ -32,6 +32,17 @@ Nenhuma task entra no ciclo se não responder claramente a pelo menos uma destas
 
 Se a resposta for "não" para todas, vai para backlog.
 
+## Status
+
+✅ **v1 estável** — tagueada em [`v1.0.0`](https://github.com/octavioadv/higilabor-agents/releases/tag/v1.0.0)
+
+Todas as issues da v1 foram fechadas. O sistema está operacional com:
+- Runner com validação de input/output por JSON Schema
+- Artefatos de execução (raw.md, parsed.json, meta.json) por run
+- Orquestração com encadeamento de sub-agentes
+- Suite de testes automatizados com CI (Python 3.11 + 3.12)
+- Schemas endurecidos (required + additionalProperties: false)
+
 ## Escopo da V1
 
 **Motores prioritários:**
@@ -57,16 +68,30 @@ higilabor-agents/
 │  ├─ 04-linkedin/       # Autoridade técnica e posts
 │  └─ 05-blog/           # Conteúdo evergreen e SEO
 ├─ context/              # Contexto institucional centralizado
-│  └─ kpis.md            # ← North Star KPI, metas e regras operacionais
-├─ tasks/                # Tasks JSON com envelope padronizado
-├─ tests/                # Testes automatizados (pytest)
-├─ outputs/              # Saídas organizadas por YYYY-MM/
+│  ├─ empresa.md
+│  ├─ kpis.md            # ← North Star KPI, metas e regras operacionais
+│  ├─ metas.md
+│  ├─ posicionamento.md
+│  ├─ publico-alvo.md
+│  ├─ restricoes.md
+│  └─ servicos.md
 ├─ scripts/
 │  ├─ run_agent.py       # Executa um agente individual
-│  └─ orchestrate.py     # Executa agente 00 e encadeia sub-agentes
+│  ├─ orchestrate.py     # Executa agente 00 e encadeia sub-agentes
+│  └─ utils.py           # Funções utilitárias compartilhadas
+├─ tasks/                # Tasks JSON com envelope padronizado
+├─ tests/                # Testes automatizados (pytest)
+│  ├─ conftest.py
+│  ├─ fixtures.py
+│  ├─ test_execution.py
+│  ├─ test_orchestrator.py
+│  └─ test_runner_validation.py
+├─ outputs/              # Saídas organizadas por YYYY-MM/
 ├─ .github/workflows/ci.yml
 ├─ .env.example
+├─ pytest.ini
 ├─ requirements.txt
+├─ ROADMAP.md
 └─ README.md
 ```
 
@@ -168,11 +193,13 @@ Os campos obrigatórios de `inputs` para cada agente estão documentados em `age
 
 ## Definição de pronto (v1)
 
-- [ ] Input inválido falha antes de qualquer chamada à API
-- [ ] Output inválido é rejeitado antes de ser aceito como resultado
-- [ ] Task válida gera output validado e artefatos salvos
-- [ ] Orquestrador devolve obrigatoriamente: north_star_kpi, kpis_secundarios, metas numéricas, prazo, fonte de dado e responsável
-- [ ] Qualquer pessoa consegue clonar, configurar `.env` e rodar um fluxo básico
+- [x] Input inválido falha antes de qualquer chamada à API
+- [x] Output inválido é rejeitado antes de ser aceito como resultado
+- [x] Task válida gera output validado e artefatos salvos
+- [x] Orquestrador devolve obrigatoriamente: north_star_kpi, kpis_secundarios, metas numéricas, prazo, fonte de dado e responsável
+- [x] Qualquer pessoa consegue clonar, configurar `.env` e rodar um fluxo básico
+- [x] CI roda pytest em Python 3.11 e 3.12 em cada push/PR
+- [x] Todos os schemas têm required, additionalProperties: false e descrições
 
 ## Convenções
 
