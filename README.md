@@ -210,8 +210,16 @@ python scripts/post_to_slack.py --dry-run  # imprime o payload sem postar
 
 ### Configuração do webhook
 
-O envio ao Slack usa um **Incoming Webhook**. Defina a variável de ambiente `SLACK_WEBHOOK_URL`
-(veja `.env.example`). Sem ela, `post_to_slack.py` falha com mensagem clara e exit code 1.
+Defina a variável de ambiente `SLACK_WEBHOOK_URL` (veja `.env.example`). Sem ela, `post_to_slack.py`
+falha com mensagem clara e exit code 1. A URL pode ser de **dois tipos**, detectados pelo caminho:
+
+- **Incoming Webhook clássico** (`https://hooks.slack.com/services/...`): envia o formato nativo do
+  Slack — `blocks` quando disponíveis, senão `{"text": ...}`.
+- **Slack Workflow trigger** (`https://hooks.slack.com/triggers/...`): dispara um workflow do Slack
+  Workflow Builder. O corpo JSON precisa ter uma chave que corresponda **exatamente** à variável
+  definida no gatilho. O script envia o texto puro sob a chave configurável por `--payload-key` ou
+  pela env `SLACK_PAYLOAD_KEY` (padrão `text`); triggers geralmente não renderizam Block Kit, então
+  `blocks` não é enviado. Se o nome da variável não bater, o Slack rejeita a chamada.
 
 ### Automação agendada
 

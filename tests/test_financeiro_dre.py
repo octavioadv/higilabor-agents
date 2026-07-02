@@ -13,7 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 from run_agent import load_json, validate_with_schema  # pyre-ignore
-from post_to_slack import build_slack_payload  # pyre-ignore
+from post_to_slack import build_slack_payload, is_trigger_url  # pyre-ignore
 
 AGENT_DIR = REPO_ROOT / "agents" / "06-financeiro-dre"
 
@@ -76,6 +76,32 @@ class TestBuildSlackPayload:
             build_slack_payload({"periodo": {"label": "Junho/2026"}})
 
 
+class TestTriggerPayload:
+    """Para triggers de workflow, envia texto puro sob a chave configuravel."""
+
+    def test_is_trigger_url(self):
+        assert is_trigger_url("https://hooks.slack.com/triggers/T0/1/abc")
+        assert not is_trigger_url("https://hooks.slack.com/services/T0/B0/xyz")
+        assert not is_trigger_url("")
+
+    def test_payload_trigger_chave_padrao(self):
+        parsed = {"mensagem_slack": {"texto": "DRE de Junho/2026"}}
+        payload = build_slack_payload(parsed, trigger=True)
+        assert payload == {"text": "DRE de Junho/2026"}
+
+    def test_payload_trigger_chave_customizada(self):
+        parsed = {"mensagem_slack": {"texto": "DRE"}}
+        payload = build_slack_payload(parsed, trigger=True, payload_key="resumo")
+        assert payload == {"resumo": "DRE"}
+
+    def test_payload_trigger_ignora_blocks(self):
+        blocks = [{"type": "section", "text": {"type": "mrkdwn", "text": "DRE"}}]
+        parsed = {"mensagem_slack": {"texto": "texto puro", "blocks": blocks}}
+        payload = build_slack_payload(parsed, trigger=True)
+        assert payload == {"text": "texto puro"}
+        assert "blocks" not in payload
+
+
 # ===================================================================
 # post_to_slack.py --dry-run (smoke test via subprocess)
 # ===================================================================
@@ -99,3 +125,30 @@ class TestPostToSlackDryRun:
         )
         assert result.returncode == 0
         assert "DRE Gerencial" in result.stdout
+
+    def test_dry_run_trigger_usa_payload_key(self, tmp_path):
+        """Com uma URL /triggers/ o dry-run monta {chave: texto}, sem blocks."""
+        parsed = {
+            "periodo": {"label": "Junho/2026"},
+            "mensagem_slack": {
+                "texto": "DRE Gerencial Junho/2026",
+                "blocks": [{"type": "section",
+                            "text": {"type": "mrkdwn", "text": "x"}}],
+            },
+        }
+        parsed_path = tmp_path / "parsed.json"
+        parsed_path.write_text(json.dumps(parsed, ensure_ascii=False), encoding="utf-8")
+
+        import os
+        env = dict(os.environ)
+        env["SLACK_WEBHOOK_URL"] = "https://hooks.slack.com/triggers/T0/1/fake"
+
+        result = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "post_to_slack.py"),
+             "--input", str(parsed_path), "--dry-run", "--payload-key", "resumo"],
+            capture_output=True, text=True, env=env,
+        )
+        assert result.returncode == 0
+        payload = json.loads(result.stdout)
+        assert payload == {"resumo": "DRE Gerencial Junho/2026"}
+        assert "blocks" not in payload
