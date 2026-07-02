@@ -1,0 +1,19 @@
+{
+  "agent_id": "06-reuniao-1a1",
+  "schema_version": "1.0",
+  "task": "Conduzir a 1:1 semanal do financeiro guiada por número e fechar com compromisso mensurável",
+  "inputs": {
+    "participante": "Bruno · financeiro",
+    "area": "financeiro",
+    "semana_referencia": "Sprint 2 · Dia 21 de 60",
+    "kpis": [
+      { "nome": "Recebimentos no mês", "meta": "R$ 120.000", "real": "R$ 92.000" },
+      { "nome": "Vencidos abordados", "meta": "100%", "real": "70%" },
+      { "nome": "Inadimplência (%)", "meta": "3%", "real": "6,5%" },
+      { "nome": "Saldo de caixa projetado", "meta": "R$ 45.000", "real": "R$ 28.000" },
+      { "nome": "DSO", "meta": "30 dias", "real": "44 dias" }
+    ],
+    "obstaculo": "Cobrança de vencidos travada por falta de régua padrão e por clientes grandes renegociando fora do prazo.",
+    "observacoes": "Três clientes concentram 80% da inadimplência atual."
+  }
+}

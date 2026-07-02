@@ -190,6 +190,7 @@ Os campos obrigatórios de `inputs` para cada agente estão documentados em `age
 | 03 | SEO Local | Páginas e pautas com intenção local | ● motor |
 | 04 | LinkedIn | Autoridade técnica e posts | ● motor |
 | 05 | Blog | Conteúdo evergreen e SEO | ● motor |
+| 06 | Reunião 1:1 | Conduz reuniões individuais semanais (1:1) e gera a ata com ações | ○ apoio |
 
 ## Definição de pronto (v1)
 

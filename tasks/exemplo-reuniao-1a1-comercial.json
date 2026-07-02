@@ -1,0 +1,19 @@
+{
+  "agent_id": "06-reuniao-1a1",
+  "schema_version": "1.0",
+  "task": "Conduzir a 1:1 semanal do comercial guiada por número e fechar com compromisso mensurável",
+  "inputs": {
+    "participante": "Ana · comercial",
+    "area": "comercial",
+    "semana_referencia": "Sprint 2 · Dia 21 de 60",
+    "kpis": [
+      { "nome": "Propostas enviadas", "meta": "10", "real": "7" },
+      { "nome": "Propostas em follow-up no prazo", "meta": "100%", "real": "60%" },
+      { "nome": "Reuniões realizadas", "meta": "8", "real": "8" },
+      { "nome": "Contratos fechados / MRR novo", "meta": "3 / R$ 9.000", "real": "1 / R$ 2.800" },
+      { "nome": "Ticket médio · margem bruta", "meta": "R$ 3.000 · 42%", "real": "R$ 2.800 · 38%" }
+    ],
+    "obstaculo": "Follow-up atrasando porque as propostas saem sem preço fechado e voltam para revisão de margem.",
+    "observacoes": "Dois leads grandes parados aguardando desconto acima do limite."
+  }
+}

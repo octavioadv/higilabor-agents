@@ -1,0 +1,19 @@
+{
+  "agent_id": "06-reuniao-1a1",
+  "schema_version": "1.0",
+  "task": "Conduzir a 1:1 semanal da operação guiada por número e fechar com compromisso mensurável",
+  "inputs": {
+    "participante": "Carla · operação",
+    "area": "operacao",
+    "semana_referencia": "Sprint 2 · Dia 21 de 60",
+    "kpis": [
+      { "nome": "Capacidade utilizada (UEP)", "meta": "90%", "real": "78%" },
+      { "nome": "UEPs produzidas", "meta": "480", "real": "410" },
+      { "nome": "Retrabalho (%)", "meta": "4%", "real": "9%" },
+      { "nome": "Prazo médio de entrega", "meta": "5 dias", "real": "7 dias" },
+      { "nome": "SLA cumprido (%)", "meta": "95%", "real": "82%" }
+    ],
+    "obstaculo": "Retrabalho alto por falha de checklist na entrada de OS, puxando prazo e derrubando SLA.",
+    "observacoes": "Falta de UEP em um turno específico concentra os atrasos."
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Output do Agente Reunião 1:1",
+  "type": "object",
+  "required": ["resultados_semana", "travou", "foco_proxima_semana", "acoes_combinadas"],
+  "properties": {
+    "resultados_semana": {
+      "type": "string",
+      "description": "Leitura dos KPIs da semana (número, não narrativa)"
+    },
+    "decisao_margem": {
+      "type": "string",
+      "description": "1 decisão de margem ou preço tomada na semana"
+    },
+    "travou": {
+      "type": "object",
+      "required": ["obstaculo", "classificacao"],
+      "additionalProperties": false,
+      "properties": {
+        "obstaculo": {
+          "type": "string",
+          "description": "O que travou o resultado da semana"
+        },
+        "classificacao": {
+          "type": "string",
+          "enum": ["capacidade", "processo", "pessoa"],
+          "description": "Classificação do obstáculo: capacidade (UEP), processo ou pessoa"
+        },
+        "destravar": {
+          "type": "string",
+          "description": "Ação para destravar o obstáculo"
+        }
+      }
+    },
+    "foco_proxima_semana": {
+      "type": "object",
+      "required": ["top3", "compromisso_mensuravel"],
+      "additionalProperties": false,
+      "properties": {
+        "top3": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 3,
+          "description": "Top 3 prioridades da próxima semana"
+        },
+        "compromisso_mensuravel": {
+          "type": "string",
+          "description": "Compromisso da próxima semana em métrica, não intenção"
+        }
+      }
+    },
+    "poda_carteira": {
+      "type": "string",
+      "description": "Cliente ou lead a cortar ou repriorizar + inadimplência a cobrar"
+    },
+    "feedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "funcionou": {
+          "type": "string",
+          "description": "1 acerto da semana"
+        },
+        "ajuste": {
+          "type": "string",
+          "description": "1 ajuste para a próxima semana"
+        }
+      }
+    },
+    "acoes_combinadas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["acao", "responsavel", "prazo"],
+        "additionalProperties": false,
+        "properties": {
+          "acao": {
+            "type": "string",
+            "description": "Ação combinada na 1:1"
+          },
+          "responsavel": {
+            "type": "string",
+            "description": "Dono da ação"
+          },
+          "prazo": {
+            "type": "string",
+            "description": "Prazo da ação"
+          }
+        }
+      },
+      "description": "Ações combinadas — toda ação tem dono e prazo"
+    },
+    "proxima_1a1": {
+      "type": "string",
+      "description": "Data da próxima 1:1"
+    }
+  },
+  "additionalProperties": false
+}

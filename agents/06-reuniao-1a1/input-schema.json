@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Input do Agente Reunião 1:1",
+  "type": "object",
+  "required": ["participante", "area", "kpis"],
+  "properties": {
+    "participante": {
+      "type": "string",
+      "description": "Nome e papel do liderado na 1:1 (ex: Ana · comercial)"
+    },
+    "area": {
+      "type": "string",
+      "enum": ["comercial", "financeiro", "operacao", "geral"],
+      "description": "Área do liderado na reunião individual"
+    },
+    "semana_referencia": {
+      "type": "string",
+      "description": "Semana ou sprint de referência (ex: Sprint 2 · Dia 21 de 60)"
+    },
+    "kpis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["nome"],
+        "additionalProperties": false,
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome do KPI acompanhado (ex: Propostas enviadas)"
+          },
+          "meta": {
+            "type": "string",
+            "description": "Meta da semana para o KPI"
+          },
+          "real": {
+            "type": "string",
+            "description": "Resultado real da semana para o KPI"
+          }
+        }
+      },
+      "description": "KPIs da semana com meta vs real (número, não narrativa)"
+    },
+    "obstaculo": {
+      "type": "string",
+      "description": "Maior obstáculo da semana (opcional)"
+    },
+    "observacoes": {
+      "type": "string",
+      "description": "Notas livres do gestor ou do liderado (opcional)"
+    }
+  },
+  "additionalProperties": false
+}
