@@ -1,0 +1,178 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Output do Agente Financeiro DRE",
+  "type": "object",
+  "required": ["periodo", "moeda", "dre", "indicadores", "alertas", "mensagem_slack"],
+  "additionalProperties": false,
+  "properties": {
+    "periodo": {
+      "type": "object",
+      "description": "Período de competência do resultado consolidado",
+      "required": ["label"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Rótulo legível do período (ex: Junho/2026)"
+        }
+      }
+    },
+    "moeda": {
+      "type": "string",
+      "description": "Moeda dos valores consolidados (ex: BRL)"
+    },
+    "dre": {
+      "type": "array",
+      "description": "Cascata completa da DRE, da receita bruta ao lucro líquido",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["conta", "valor", "tipo"],
+        "additionalProperties": false,
+        "properties": {
+          "conta": {
+            "type": "string",
+            "description": "Nome da linha da DRE (ex: Receita Bruta, Lucro Líquido)"
+          },
+          "valor": {
+            "type": "number",
+            "description": "Valor monetário da linha, com 2 casas decimais"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": ["receita", "deducao", "custo", "despesa", "resultado_financeiro", "imposto", "subtotal"],
+            "description": "Classificação da linha na cascata da DRE"
+          },
+          "percentual_receita_liquida": {
+            "type": "number",
+            "description": "Representatividade da linha sobre a receita líquida (%)"
+          }
+        }
+      }
+    },
+    "indicadores": {
+      "type": "object",
+      "description": "Indicadores-chave calculados a partir da DRE",
+      "required": ["receita_liquida", "lucro_bruto", "margem_bruta", "ebitda", "margem_ebitda", "ebit", "lucro_liquido", "margem_liquida"],
+      "additionalProperties": false,
+      "properties": {
+        "receita_liquida": {
+          "type": "number",
+          "description": "Receita líquida (receita bruta menos deduções)"
+        },
+        "lucro_bruto": {
+          "type": "number",
+          "description": "Lucro bruto (receita líquida menos custos)"
+        },
+        "margem_bruta": {
+          "type": "number",
+          "description": "Margem bruta sobre a receita líquida (%)"
+        },
+        "ebitda": {
+          "type": "number",
+          "description": "EBITDA (lucro antes de juros, impostos, depreciação e amortização)"
+        },
+        "margem_ebitda": {
+          "type": "number",
+          "description": "Margem EBITDA sobre a receita líquida (%)"
+        },
+        "ebit": {
+          "type": "number",
+          "description": "EBIT (lucro operacional após depreciação e amortização)"
+        },
+        "lucro_liquido": {
+          "type": "number",
+          "description": "Lucro líquido do período"
+        },
+        "margem_liquida": {
+          "type": "number",
+          "description": "Margem líquida sobre a receita líquida (%)"
+        }
+      }
+    },
+    "variacoes": {
+      "type": "object",
+      "description": "Variações percentuais vs período anterior e vs meta",
+      "additionalProperties": false,
+      "properties": {
+        "vs_periodo_anterior": {
+          "type": "object",
+          "description": "Variação percentual em relação ao período anterior",
+          "additionalProperties": false,
+          "properties": {
+            "receita_liquida_pct": {
+              "type": "number",
+              "description": "Variação da receita líquida vs período anterior (%)"
+            },
+            "ebitda_pct": {
+              "type": "number",
+              "description": "Variação do EBITDA vs período anterior (%)"
+            },
+            "lucro_liquido_pct": {
+              "type": "number",
+              "description": "Variação do lucro líquido vs período anterior (%)"
+            }
+          }
+        },
+        "vs_meta": {
+          "type": "object",
+          "description": "Variação percentual em relação à meta",
+          "additionalProperties": false,
+          "properties": {
+            "receita_liquida_pct": {
+              "type": "number",
+              "description": "Variação da receita líquida vs meta (%)"
+            },
+            "ebitda_pct": {
+              "type": "number",
+              "description": "Variação do EBITDA vs meta (%)"
+            },
+            "lucro_liquido_pct": {
+              "type": "number",
+              "description": "Variação do lucro líquido vs meta (%)"
+            }
+          }
+        }
+      }
+    },
+    "alertas": {
+      "type": "array",
+      "description": "Alertas gerados quando margens ou variações estouram os limites",
+      "items": {
+        "type": "object",
+        "required": ["severidade", "mensagem"],
+        "additionalProperties": false,
+        "properties": {
+          "severidade": {
+            "type": "string",
+            "enum": ["info", "atencao", "critico"],
+            "description": "Severidade do alerta"
+          },
+          "mensagem": {
+            "type": "string",
+            "description": "Descrição do alerta e do limite estourado"
+          }
+        }
+      }
+    },
+    "mensagem_slack": {
+      "type": "object",
+      "description": "Mensagem pronta para publicação no Slack",
+      "required": ["texto"],
+      "additionalProperties": false,
+      "properties": {
+        "texto": {
+          "type": "string",
+          "description": "Texto em markdown (mrkdwn) pronto para o Slack, com destaques e emojis financeiros"
+        },
+        "blocks": {
+          "type": "array",
+          "description": "Blocos opcionais no formato Slack Block Kit",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

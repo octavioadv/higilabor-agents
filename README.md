@@ -190,6 +190,42 @@ Os campos obrigatórios de `inputs` para cada agente estão documentados em `age
 | 03 | SEO Local | Páginas e pautas com intenção local | ● motor |
 | 04 | LinkedIn | Autoridade técnica e posts | ● motor |
 | 05 | Blog | Conteúdo evergreen e SEO | ● motor |
+| 06 | Financeiro DRE | Consolidação de DRE gerencial (ERP → Slack) | ● núcleo |
+
+## Automação DRE → Slack (Agente 06)
+
+O agente `06-financeiro-dre` automatiza o fluxo **DRE ↔ ERP → Slack**:
+
+1. Os dados financeiros exportados do ERP entram como `inputs` de uma task (ver `tasks/exemplo-financeiro-dre.json`).
+2. O agente consolida a **DRE gerencial** (da receita bruta ao lucro líquido), calcula margens (bruta, EBITDA, líquida), variações vs período anterior e vs meta, gera alertas e produz uma `mensagem_slack` pronta para publicação.
+3. O script `scripts/post_to_slack.py` lê o `parsed.json` da execução e posta a mensagem no Slack.
+
+### Rodar manualmente
+
+```bash
+python scripts/run_agent.py --task tasks/exemplo-financeiro-dre.json
+python scripts/post_to_slack.py            # descobre o run mais recente do agente 06
+python scripts/post_to_slack.py --dry-run  # imprime o payload sem postar
+```
+
+### Configuração do webhook
+
+O envio ao Slack usa um **Incoming Webhook**. Defina a variável de ambiente `SLACK_WEBHOOK_URL`
+(veja `.env.example`). Sem ela, `post_to_slack.py` falha com mensagem clara e exit code 1.
+
+### Automação agendada
+
+O workflow `.github/workflows/dre-slack.yml` ("DRE → Slack") roda:
+- **`workflow_dispatch`** — sob demanda, com input `task_file` (padrão `tasks/exemplo-financeiro-dre.json`);
+- **`schedule`** — no dia 1 de cada mês (cron `0 12 1 * *`).
+
+Requer os secrets `GEMINI_API_KEY` e `SLACK_WEBHOOK_URL`. Se algum estiver ausente, o job é pulado graciosamente.
+
+### Contexto financeiro escopado
+
+O contexto institucional financeiro fica em `context/financeiro.md` e é injetado **apenas** no agente 06
+via `agents/06-financeiro-dre/agent-context.json`. Os agentes de conteúdo (00–05) têm seus próprios
+`agent-context.json` que não incluem `financeiro.md`, evitando poluir seus prompts.
 
 ## Definição de pronto (v1)
 

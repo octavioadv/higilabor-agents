@@ -27,7 +27,7 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "Lista de agentes ativos no repositório",
-      "default": ["01-depoimentos", "02-cases", "03-seo-local"]
+      "default": ["01-depoimentos", "02-cases", "03-seo-local", "04-linkedin", "05-blog", "06-financeiro-dre"]
     }
   }
 }

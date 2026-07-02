@@ -1,0 +1,49 @@
+{
+  "agent_id": "06-financeiro-dre",
+  "schema_version": "1.0",
+  "task": "Consolidar a DRE gerencial de Junho/2026 a partir dos dados exportados do ERP e gerar a mensagem para o Slack.",
+  "inputs": {
+    "periodo": {
+      "mes": 6,
+      "ano": 2026,
+      "label": "Junho/2026"
+    },
+    "moeda": "BRL",
+    "receita_bruta": 1250000.00,
+    "deducoes": {
+      "impostos_sobre_vendas": 168750.00,
+      "devolucoes": 12500.00,
+      "descontos": 18750.00
+    },
+    "custos": {
+      "cpv_csp": 587500.00,
+      "mao_de_obra_direta": 402000.00,
+      "materiais_insumos": 185500.00
+    },
+    "despesas_operacionais": {
+      "comerciais": 118000.00,
+      "administrativas": 156000.00,
+      "outras": 24000.00
+    },
+    "depreciacao_amortizacao": 38000.00,
+    "resultado_financeiro": {
+      "receitas_financeiras": 9500.00,
+      "despesas_financeiras": 27500.00
+    },
+    "impostos_sobre_lucro": {
+      "ir_csll": 43000.00
+    },
+    "comparativos": {
+      "periodo_anterior": {
+        "receita_liquida": 985000.00,
+        "ebitda": 148000.00,
+        "lucro_liquido": 82000.00
+      },
+      "meta": {
+        "receita_liquida": 1080000.00,
+        "ebitda": 175000.00,
+        "lucro_liquido": 95000.00
+      }
+    }
+  }
+}

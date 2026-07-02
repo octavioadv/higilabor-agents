@@ -1,0 +1,175 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Input do Agente Financeiro DRE",
+  "type": "object",
+  "required": ["periodo", "receita_bruta", "deducoes", "custos", "despesas_operacionais"],
+  "additionalProperties": false,
+  "properties": {
+    "periodo": {
+      "type": "object",
+      "description": "Período de competência do resultado",
+      "required": ["mes", "ano"],
+      "additionalProperties": false,
+      "properties": {
+        "mes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "description": "Mês de competência (1 a 12)"
+        },
+        "ano": {
+          "type": "integer",
+          "description": "Ano de competência (ex: 2026)"
+        },
+        "label": {
+          "type": "string",
+          "description": "Rótulo legível do período (ex: Junho/2026)"
+        }
+      }
+    },
+    "moeda": {
+      "type": "string",
+      "default": "BRL",
+      "description": "Moeda dos valores informados (ex: BRL)"
+    },
+    "receita_bruta": {
+      "type": "number",
+      "description": "Receita bruta total do período"
+    },
+    "deducoes": {
+      "type": "object",
+      "description": "Deduções da receita bruta",
+      "required": ["impostos_sobre_vendas"],
+      "additionalProperties": false,
+      "properties": {
+        "impostos_sobre_vendas": {
+          "type": "number",
+          "description": "Impostos incidentes sobre vendas (ex: ISS, ICMS, PIS/COFINS)"
+        },
+        "devolucoes": {
+          "type": "number",
+          "description": "Devoluções de vendas no período"
+        },
+        "descontos": {
+          "type": "number",
+          "description": "Descontos concedidos no período"
+        }
+      }
+    },
+    "custos": {
+      "type": "object",
+      "description": "Custos dos produtos e serviços vendidos",
+      "required": ["cpv_csp"],
+      "additionalProperties": false,
+      "properties": {
+        "cpv_csp": {
+          "type": "number",
+          "description": "Custo dos produtos/serviços vendidos (CPV/CSP)"
+        },
+        "mao_de_obra_direta": {
+          "type": "number",
+          "description": "Parcela de mão de obra direta dentro do custo"
+        },
+        "materiais_insumos": {
+          "type": "number",
+          "description": "Parcela de materiais e insumos dentro do custo"
+        }
+      }
+    },
+    "despesas_operacionais": {
+      "type": "object",
+      "description": "Despesas operacionais do período",
+      "required": ["comerciais", "administrativas"],
+      "additionalProperties": false,
+      "properties": {
+        "comerciais": {
+          "type": "number",
+          "description": "Despesas comerciais e de vendas"
+        },
+        "administrativas": {
+          "type": "number",
+          "description": "Despesas administrativas e gerais"
+        },
+        "outras": {
+          "type": "number",
+          "description": "Outras despesas operacionais"
+        }
+      }
+    },
+    "depreciacao_amortizacao": {
+      "type": "number",
+      "description": "Depreciação e amortização do período (usada para reconciliar EBITDA e EBIT)"
+    },
+    "resultado_financeiro": {
+      "type": "object",
+      "description": "Resultado financeiro do período",
+      "additionalProperties": false,
+      "properties": {
+        "receitas_financeiras": {
+          "type": "number",
+          "description": "Receitas financeiras (ex: rendimentos, juros ativos)"
+        },
+        "despesas_financeiras": {
+          "type": "number",
+          "description": "Despesas financeiras (ex: juros passivos, tarifas bancárias)"
+        }
+      }
+    },
+    "impostos_sobre_lucro": {
+      "type": "object",
+      "description": "Impostos incidentes sobre o lucro",
+      "additionalProperties": false,
+      "properties": {
+        "ir_csll": {
+          "type": "number",
+          "description": "Imposto de Renda e Contribuição Social sobre o Lucro (IR/CSLL)"
+        }
+      }
+    },
+    "comparativos": {
+      "type": "object",
+      "description": "Referências para cálculo de variações",
+      "additionalProperties": false,
+      "properties": {
+        "periodo_anterior": {
+          "type": "object",
+          "description": "Indicadores do período anterior para comparação",
+          "additionalProperties": false,
+          "properties": {
+            "receita_liquida": {
+              "type": "number",
+              "description": "Receita líquida do período anterior"
+            },
+            "ebitda": {
+              "type": "number",
+              "description": "EBITDA do período anterior"
+            },
+            "lucro_liquido": {
+              "type": "number",
+              "description": "Lucro líquido do período anterior"
+            }
+          }
+        },
+        "meta": {
+          "type": "object",
+          "description": "Indicadores de meta para comparação",
+          "additionalProperties": false,
+          "properties": {
+            "receita_liquida": {
+              "type": "number",
+              "description": "Meta de receita líquida do período"
+            },
+            "ebitda": {
+              "type": "number",
+              "description": "Meta de EBITDA do período"
+            },
+            "lucro_liquido": {
+              "type": "number",
+              "description": "Meta de lucro líquido do período"
+            }
+          }
+        }
+      }
+    }
+  }
+}

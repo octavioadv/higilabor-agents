@@ -1,0 +1,62 @@
+name: DRE → Slack
+
+# Fluxo DRE <-> ERP -> Slack:
+# 1. Executa o agente 06-financeiro-dre sobre uma task com os dados exportados do ERP.
+# 2. Publica a mensagem consolidada no Slack via Incoming Webhook.
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_file:
+        description: "Arquivo de task com os dados financeiros do ERP"
+        required: true
+        default: "tasks/exemplo-financeiro-dre.json"
+  schedule:
+    # Roda no dia 1 de cada mes, as 12:00 UTC (fechamento mensal da DRE).
+    - cron: "0 12 1 * *"
+
+jobs:
+  dre-slack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Guarda: sem os secrets nao ha como rodar o fluxo de verdade.
+      # No agendamento mensal, pula graciosamente quando os secrets estao ausentes.
+      - name: Verificar secrets
+        id: guard
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ] || [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "secrets_ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::GEMINI_API_KEY ou SLACK_WEBHOOK_URL ausentes — fluxo DRE → Slack pulado."
+          else
+            echo "secrets_ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Gerar DRE gerencial (agente 06)
+        if: steps.guard.outputs.secrets_ok == 'true'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-2.5-flash
+        run: |
+          python scripts/run_agent.py --task "${{ github.event.inputs.task_file || 'tasks/exemplo-financeiro-dre.json' }}"
+
+      - name: Publicar no Slack
+        if: steps.guard.outputs.secrets_ok == 'true'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python scripts/post_to_slack.py
