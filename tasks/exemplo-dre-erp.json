@@ -1,0 +1,35 @@
+{
+  "agent_id": "06-dre-erp",
+  "schema_version": "1.0",
+  "task": "Gerar a DRE do período a partir dos dados exportados do ERP e analisar margens e resultado.",
+  "inputs": {
+    "periodo": "2026-06",
+    "fonte_erp": "Conta Azul",
+    "moeda": "BRL",
+    "regime_tributario": "simples_nacional",
+    "receita_bruta": 500000,
+    "deducoes": {
+      "impostos_sobre_vendas": 30000,
+      "devolucoes": 5000,
+      "descontos_incondicionais": 0
+    },
+    "custos": 250000,
+    "despesas_operacionais": {
+      "comerciais": 25000,
+      "administrativas": 40000,
+      "pessoal": 60000,
+      "outras": 10000
+    },
+    "receitas_financeiras": 2000,
+    "despesas_financeiras": 8000,
+    "outras_receitas": 0,
+    "outras_despesas": 0,
+    "impostos_sobre_lucro": 0,
+    "comparativo": {
+      "periodo": "2026-05",
+      "receita_liquida": 440000,
+      "lucro_liquido": 60000
+    },
+    "observacoes": "Mês com aumento de custo de pessoal por contratação de equipe operacional."
+  }
+}

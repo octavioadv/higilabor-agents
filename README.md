@@ -66,7 +66,8 @@ higilabor-agents/
 │  ├─ 02-cases/          # Narrativas comerciais
 │  ├─ 03-seo-local/      # Páginas e pautas com intenção local
 │  ├─ 04-linkedin/       # Autoridade técnica e posts
-│  └─ 05-blog/           # Conteúdo evergreen e SEO
+│  ├─ 05-blog/           # Conteúdo evergreen e SEO
+│  └─ 06-dre-erp/        # DRE a partir de dados do ERP
 ├─ context/              # Contexto institucional centralizado
 │  ├─ empresa.md
 │  ├─ kpis.md            # ← North Star KPI, metas e regras operacionais
@@ -190,6 +191,7 @@ Os campos obrigatórios de `inputs` para cada agente estão documentados em `age
 | 03 | SEO Local | Páginas e pautas com intenção local | ● motor |
 | 04 | LinkedIn | Autoridade técnica e posts | ● motor |
 | 05 | Blog | Conteúdo evergreen e SEO | ● motor |
+| 06 | DRE ERP | DRE a partir de dados exportados do ERP | ● financeiro |
 
 ## Definição de pronto (v1)
 

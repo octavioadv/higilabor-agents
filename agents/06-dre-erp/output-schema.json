@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Output do Agente DRE ERP",
+  "type": "object",
+  "required": ["periodo", "dre", "margens", "analise", "recomendacoes", "dre_markdown"],
+  "additionalProperties": false,
+  "properties": {
+    "periodo": {
+      "type": "string",
+      "description": "Período de referência da DRE"
+    },
+    "moeda": {
+      "type": "string",
+      "description": "Moeda dos valores (ex: BRL)"
+    },
+    "dre": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receita_bruta", "receita_liquida", "lucro_bruto", "resultado_operacional", "lucro_liquido"],
+      "properties": {
+        "receita_bruta": { "type": "number", "description": "Receita operacional bruta" },
+        "total_deducoes": { "type": "number", "description": "Total de deduções (impostos sobre vendas, devoluções, descontos)" },
+        "receita_liquida": { "type": "number", "description": "Receita bruta menos deduções" },
+        "custos": { "type": "number", "description": "Custo dos serviços/produtos vendidos" },
+        "lucro_bruto": { "type": "number", "description": "Receita líquida menos custos" },
+        "total_despesas_operacionais": { "type": "number", "description": "Soma das despesas operacionais" },
+        "resultado_operacional": { "type": "number", "description": "Lucro bruto menos despesas operacionais (EBIT)" },
+        "resultado_financeiro": { "type": "number", "description": "Receitas financeiras menos despesas financeiras" },
+        "resultado_antes_impostos": { "type": "number", "description": "Resultado operacional +/- resultado financeiro e outras receitas/despesas" },
+        "impostos_sobre_lucro": { "type": "number", "description": "IRPJ + CSLL do período" },
+        "lucro_liquido": { "type": "number", "description": "Resultado do exercício após impostos" }
+      }
+    },
+    "margens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["margem_bruta", "margem_operacional", "margem_liquida"],
+      "properties": {
+        "margem_bruta": { "type": "string", "description": "Lucro bruto / receita líquida (em %)" },
+        "margem_operacional": { "type": "string", "description": "Resultado operacional / receita líquida (em %)" },
+        "margem_liquida": { "type": "string", "description": "Lucro líquido / receita líquida (em %)" }
+      }
+    },
+    "analise_vertical": {
+      "type": "array",
+      "description": "Peso de cada conta sobre a receita líquida",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "conta": { "type": "string" },
+          "valor": { "type": "number" },
+          "percentual_receita_liquida": { "type": "string" }
+        }
+      }
+    },
+    "analise_horizontal": {
+      "type": "string",
+      "description": "Comparação com o período anterior (variação de receita, resultado e margens). Vazio se não houver comparativo."
+    },
+    "analise": {
+      "type": "string",
+      "description": "Resumo executivo da saúde financeira do período"
+    },
+    "alertas": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Riscos, inconsistências ou dados ausentes identificados"
+    },
+    "recomendacoes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Ações priorizáveis para melhorar o resultado"
+    },
+    "dre_markdown": {
+      "type": "string",
+      "description": "DRE completa formatada em tabela markdown, pronta para relatório"
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Input do Agente DRE ERP",
+  "type": "object",
+  "required": ["periodo", "receita_bruta"],
+  "additionalProperties": false,
+  "properties": {
+    "periodo": {
+      "type": "string",
+      "description": "Período de referência da DRE (ex: 2026-06, Q2 2026, Jan-Jun 2026)"
+    },
+    "fonte_erp": {
+      "type": "string",
+      "description": "Nome/origem da exportação do ERP (ex: Omie, Bling, TOTVS, Conta Azul)"
+    },
+    "moeda": {
+      "type": "string",
+      "description": "Moeda dos valores",
+      "default": "BRL"
+    },
+    "regime_tributario": {
+      "type": "string",
+      "enum": ["simples_nacional", "lucro_presumido", "lucro_real"],
+      "description": "Regime tributário da empresa"
+    },
+    "receita_bruta": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Receita operacional bruta do período"
+    },
+    "deducoes": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Deduções da receita bruta",
+      "properties": {
+        "impostos_sobre_vendas": { "type": "number", "minimum": 0 },
+        "devolucoes": { "type": "number", "minimum": 0 },
+        "descontos_incondicionais": { "type": "number", "minimum": 0 }
+      }
+    },
+    "custos": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Custo dos produtos/serviços vendidos (CMV/CPV/CSP)"
+    },
+    "despesas_operacionais": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Despesas operacionais do período",
+      "properties": {
+        "comerciais": { "type": "number", "minimum": 0 },
+        "administrativas": { "type": "number", "minimum": 0 },
+        "pessoal": { "type": "number", "minimum": 0 },
+        "outras": { "type": "number", "minimum": 0 }
+      }
+    },
+    "receitas_financeiras": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Receitas financeiras do período"
+    },
+    "despesas_financeiras": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Despesas financeiras do período"
+    },
+    "outras_receitas": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Outras receitas não operacionais"
+    },
+    "outras_despesas": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Outras despesas não operacionais"
+    },
+    "impostos_sobre_lucro": {
+      "type": "number",
+      "minimum": 0,
+      "description": "IRPJ + CSLL do período (quando aplicável)"
+    },
+    "comparativo": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Valores do período anterior para análise horizontal",
+      "properties": {
+        "periodo": { "type": "string" },
+        "receita_liquida": { "type": "number" },
+        "lucro_liquido": { "type": "number" }
+      }
+    },
+    "observacoes": {
+      "type": "string",
+      "description": "Notas do contexto financeiro do período"
+    }
+  }
+}
